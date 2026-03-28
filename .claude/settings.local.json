@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv index.html index_backup.html)",
+      "Bash(mv index_new.html index.html)"
+    ]
+  }
+}
