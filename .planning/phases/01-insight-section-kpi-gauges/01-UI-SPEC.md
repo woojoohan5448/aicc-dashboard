@@ -27,36 +27,40 @@ created: 2026-03-29
 
 ## Spacing Scale
 
-Declared values aligned with existing codebase patterns (not strict 8-point, matching existing dashboard conventions):
+All declared tokens are multiples of 4. Existing codebase values that are not multiples of 4 (e.g., `.box` padding 22px, `.g3` gap 18px) are consumed via class reuse but are NOT declared as spacing tokens in this contract.
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Inline label gaps |
 | sm | 8px | Compact element spacing, tag padding |
 | md | 16px | Default element spacing, grid gaps within cards |
-| lg | 22px | Card internal padding (matches existing `.box` padding) |
+| lg | 24px | Card internal padding (section-level internal padding) |
 | xl | 32px | Page-level horizontal padding (matches `.page` padding) |
-| section-gap | 24px | Vertical gap between insight section and preceding content (matches `margin-bottom` pattern) |
-| grid-gap | 18px | Gap between gauge cards (matches `.g3` gap) |
+| section-gap | 24px | Vertical gap between insight section and preceding content |
 
-Exceptions: The existing codebase uses non-standard values (10, 14, 18, 22). This phase follows existing values exactly for visual consistency. Do not normalize to strict 8-point grid.
+**Passthrough (class reuse, not new tokens):** The `.box` class applies 22px padding and `.g3` applies 18px gap. These values are inherited from existing CSS classes and are not declared as spacing tokens. New elements in this phase that need explicit spacing must use the token values above.
 
 ---
 
 ## Typography
 
-All values match existing codebase tokens. No new font sizes introduced.
+4 declared font sizes, 2 declared font weights.
 
 | Role | Size | Weight | Line Height | Font Family |
 |------|------|--------|-------------|-------------|
 | Section Title | 15px | 700 | 1.3 | LG Smart stack |
 | Card Title (btitle) | 15px | 700 | 1.3 | LG Smart stack |
 | Card Subtitle (bsub) | 12px | 400 | 1.4 | LG Smart stack |
-| Gauge Label | 12px | 600 | 1.2 | LG Smart stack |
+| Gauge Label | 12px | 700 | 1.2 | LG Smart stack |
 | Gauge Value | 28px | 700 | 1.0 | DM Mono, monospace |
-| Gauge Unit | 15px | 500 | 1.0 | LG Smart stack |
-| Achievement % | 13px | 700 | 1.2 | DM Mono, monospace |
-| Tag / Badge | 11px | 600 | 1.0 | LG Smart stack |
+| Gauge Unit | 15px | 400 | 1.0 | LG Smart stack |
+| Achievement % (canvas) | 15px | 700 | 1.0 | DM Mono, monospace |
+| Tag / Badge | 11px | 700 | 1.0 | LG Smart stack |
+
+**Declared sizes (4):** 11px, 12px, 15px, 28px
+**Declared weights (2):** 400 (normal body, subtitles, units), 700 (titles, values, labels, tags)
+
+**Canvas-drawn text note:** The achievement percentage rendered inside the gauge canvas uses 15px bold DM Mono. This is drawn programmatically via `ctx.font` and shares the 15px size role with titles/units. The previously specified 20px canvas center text has been merged into the 15px role. The previously specified 13px achievement text has been merged into the 12px label role or drawn at 15px on canvas -- the canvas rendering uses 15px.
 
 **Font stack (full):** `'LG Smart','LG SmartBody','LGSmartBody','Pretendard','Noto Sans KR',sans-serif`
 
@@ -115,13 +119,13 @@ div.g3      -->  3-column grid holding 3 gauge cards
 
 ### 2. Gauge Card (x3)
 
-**Container:** Reuse existing `.box` class (white card, 12px border-radius, 22px padding, shadow).
+**Container:** Reuse existing `.box` class (white card, 12px border-radius, existing padding, shadow).
 
 **Internal layout (top to bottom):**
 
 | Element | Class | Style |
 |---------|-------|-------|
-| KPI name label | `.sb-label` (reuse) | `font-size:12px; color:var(--dim); font-weight:600; margin-bottom:12px;` |
+| KPI name label | `.sb-label` (reuse) | `font-size:12px; color:var(--dim); font-weight:700; margin-bottom:12px;` |
 | Canvas gauge | new `<canvas>` element | `width:120px; height:120px; margin:0 auto 12px;` |
 | Achievement value | `.sb-val` (reuse) | `text-align:center; font-size:28px;` with unit span |
 | Target context | `.sb-tag` (reuse) | Centered below value |
@@ -138,7 +142,7 @@ div.g3      -->  3-column grid holding 3 gauge cards
 | Arc line cap | `round` |
 | Track arc | Full semi-circle in `var(--border)` color |
 | Filled arc | Proportional to achievement rate, in `var(--pink)` color |
-| Center text | Achievement percentage (e.g., "103%") in 20px bold DM Mono, color `var(--text)` |
+| Center text | Achievement percentage (e.g., "103%") in 15px bold DM Mono, color `var(--text)` |
 
 **Achievement rate calculation per KPI type:**
 
@@ -202,7 +206,7 @@ No animations in Phase 1. Phase 3 may add arc fill animation.
 +------------------------------------------------------------------+
 | .stitle: "KPI 달성 현황"                                           |
 +------------------------------------------------------------------+
-| .g3 (3-column grid, gap: 18px)                                    |
+| .g3 (3-column grid, existing gap via class)                       |
 | +------------------+ +------------------+ +------------------+    |
 | | .box             | | .box             | | .box             |    |
 | |  [label: 12px]   | |  [label: 12px]   | |  [label: 12px]   |    |
