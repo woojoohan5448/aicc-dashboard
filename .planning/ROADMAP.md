@@ -27,11 +27,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. RRMS 달성률이 미니 게이지로 목표 대비 현재값을 시각적으로 표시한다
   3. KA레퍼런스 달성률이 미니 게이지로 목표 대비 현재값을 시각적으로 표시한다
   4. 구축형수주액 달성률이 미니 게이지로 목표 대비 현재값을 시각적으로 표시한다
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: yes
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md -- Insight section HTML + drawGauge() + 3 KPI canvas gauges
 
 ### Phase 2: Trend & Projection Analysis
 **Goal**: 사용자가 KPI 추세와 연말 목표 달성 가능성을 자동 분석 결과로 확인할 수 있다
@@ -68,6 +68,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Insight Section & KPI Gauges | 0/0 | Not started | - |
+| 1. Insight Section & KPI Gauges | 0/1 | Not started | - |
 | 2. Trend & Projection Analysis | 0/0 | Not started | - |
 | 3. Anomaly Detection & Visual Polish | 0/0 | Not started | - |
