@@ -6809,6 +6809,19 @@ window.addEventListener('load',()=>{
   window._built={ov:true};
   setTimeout(()=>{
     try { buildOv(); } catch(e) { console.error('buildOv error:', e); }
+    // READ_ONLY 모드: 버튼 숨기고 캐시 데이터로 인사이트 표시
+    if(window._READ_ONLY===true){
+      const btn=document.getElementById('btn-ai');
+      if(btn)btn.style.display='none';
+      if(window._SHEETS_INSIGHTS){
+        const si=window._SHEETS_INSIGHTS;
+        ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{if(si[t])_aiCache.results[t]=si[t];});
+        _aiCache.timestamp=si.analysisTime||null;
+        _aiCache.market1=si.market1||null;
+        _aiCache.market2=si.market2||null;
+        _renderCachedInsight('ov');
+      }
+    }
   }, 1000);
 });
 </script>
