@@ -48,21 +48,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GAUGE-01 | — | Pending |
-| GAUGE-02 | — | Pending |
-| GAUGE-03 | — | Pending |
-| INST-01 | — | Pending |
-| INST-02 | — | Pending |
-| INST-03 | — | Pending |
-| INST-04 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
+| GAUGE-01 | Phase 1 | Pending |
+| GAUGE-02 | Phase 1 | Pending |
+| GAUGE-03 | Phase 1 | Pending |
+| INST-01 | Phase 2 | Pending |
+| INST-02 | Phase 2 | Pending |
+| INST-03 | Phase 3 | Pending |
+| INST-04 | Phase 2 | Pending |
+| UI-01 | Phase 3 | Pending |
+| UI-02 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9 ⚠️
+- Mapped to phases: 9
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-29*
-*Last updated: 2026-03-29 after initial definition*
+*Last updated: 2026-03-29 after roadmap creation*
