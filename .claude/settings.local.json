@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(mv index.html index_backup.html)",
-      "Bash(mv index_new.html index.html)"
+      "Bash(mv index_new.html index.html)",
+      "Bash(node:*)",
+      "Bash(wc -l .planning/codebase/*.md)",
+      "Bash(grep -E '\\(sk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]+|sk_test_[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]+|AKIA[A-Z0-9]{16}|xox[baprs]-[a-zA-Z0-9-]+|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\\\\.eyJ[a-zA-Z0-9_-]+\\\\.\\)' .planning/codebase/*.md)",
+      "Bash(grep -n \"^}$\" c:/Users/한우주/Desktop/aicc-dashboard/index.html)",
+      "Bash(sed -n '3539p' c:/Users/한우주/Desktop/aicc-dashboard/index.html)",
+      "Bash(python3:*)"
     ]
   }
 }

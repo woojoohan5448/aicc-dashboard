@@ -1,5 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
+<script>
+const _DASHBOARD_PW='aicc2026';
+if(sessionStorage.getItem('aicc_auth')!=='ok'){
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.body.innerHTML=`
+    <div id="pw-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#F0F2F5;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Pretendard','Noto Sans KR',sans-serif;">
+      <div style="background:#fff;border-radius:16px;padding:48px 40px;width:360px;box-shadow:0 4px 24px rgba(0,0,0,0.10);text-align:center;">
+        <div style="background:#2D2D6B;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:6px;display:inline-block;margin-bottom:20px;letter-spacing:1px;">AICC</div>
+        <h1 style="font-size:20px;font-weight:700;color:#111827;margin-bottom:8px;">실적 현황 대시보드</h1>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:28px;">접근 비밀번호를 입력해주세요</p>
+        <input type="password" id="pw-input" style="width:100%;padding:12px 16px;border:1.5px solid #e2e5ea;border-radius:8px;font-size:14px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:4px;box-sizing:border-box;" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+        <button onclick="checkPw()" style="width:100%;padding:12px;background:#2D2D6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">입장하기</button>
+        <div id="pw-error" style="color:#b91c1c;font-size:13px;margin-top:8px;display:none;">비밀번호가 올바르지 않습니다</div>
+      </div>
+    </div>`;
+    document.getElementById('pw-input').focus();
+  });
+  window.checkPw=function(){
+    if(document.getElementById('pw-input').value===_DASHBOARD_PW){
+      sessionStorage.setItem('aicc_auth','ok');
+      location.reload();
+    }else{
+      document.getElementById('pw-error').style.display='block';
+    }
+  };
+}
+</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>실적 현황 대시보드</title>
@@ -84,6 +111,24 @@ body { background:var(--bg); color:var(--text);
   font-size:12px;font-weight:600;color:var(--dim);background:#f8f8fa;
   text-align:center;outline:none;min-width:40px;width:100%;}
 .edit-input-hdr:focus{border-color:var(--pink);background:#fff;color:var(--text);}
+/* ── AI 인사이트 ── */
+.ai-placeholder{background:#F8F9FF;border:1px dashed var(--border);border-radius:10px;padding:14px 20px;font-size:13px;color:var(--muted);margin-bottom:20px;}
+.ai-insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+@media(max-width:900px){.ai-insight-grid{grid-template-columns:1fr;}}
+.ai-market-section{margin-bottom:20px;}
+.ai-market-title{font-size:13px;font-weight:700;color:var(--dim);margin-bottom:10px;}
+.ai-market-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:900px){.ai-market-grid{grid-template-columns:1fr;}}
+.market-item{margin-bottom:14px;}
+.market-item-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.market-item-body{font-size:12px;color:var(--dim);line-height:1.7;padding-left:14px;margin:0;}
+.market-source{font-size:11px;color:var(--muted);margin-top:4px;padding-left:4px;}
+.market-source a{color:var(--dim);text-decoration:none;}
+.market-source a:hover{text-decoration:underline;}
+.ai-card{background:var(--card,#fff);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px 20px;display:flex;align-items:stretch;overflow:hidden;}
+.ai-card-bar{width:4px;flex-shrink:0;border-radius:2px;margin-right:14px;}
+.ai-card-title{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.ai-card-body{font-size:13px;line-height:1.7;color:var(--text);}
 /* ── HEADER ── */
 .header { background:#fff; border-bottom:3px solid var(--pink);
   padding:0 32px; display:flex; align-items:center;
@@ -108,8 +153,7 @@ body { background:var(--bg); color:var(--text);
   transition:.2s; white-space:nowrap; flex-shrink:0; }
 .tb:hover { color:var(--text); }
 .tb.on { color:var(--pink); border-bottom-color:var(--pink); font-weight:800; }
-.tb-edit { margin-left:auto; color:var(--pink) !important;
-  border-left:1px solid var(--border); padding-left:20px; }
+.tb-edit { color:var(--pink) !important; padding-left:12px; }
 
 /* ── PAGES ── */
 .page { display:none; padding:28px 32px; background:var(--bg);
@@ -461,7 +505,11 @@ tr:hover td { background:var(--bg); }
   <button class="tb" onclick="go(&#39;bld&#39;,this)">구축형</button>
   <button class="tb" onclick="go(&#39;ch&#39;,this)">채널 현황</button>
   <button class="tb" onclick="go(&#39;comp&#39;,this)">경쟁현황</button>
-  <button class="tb tb-edit" onclick="go(&#39;edit&#39;,this)">✏️ 데이터 입력</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:0;">
+    <button class="tb" style="color:var(--pink);font-weight:600;" id="btn-ai" onclick="runTabAi()">📊 인사이트 분석</button>
+    <div style="width:1px;height:20px;background:var(--border);"></div>
+    <button class="tb tb-edit" onclick="go(&#39;edit&#39;,this)" style="margin-left:0;">✏️ 데이터 입력</button>
+  </div>
 </div>
 
 <div class="page" id="p-kpi"></div>
@@ -520,14 +568,14 @@ tr:hover td { background:var(--bg); }
     <div class="sb-header" style="background:#4B4BAD">🏗️ 구축형 종합</div>
     <div class="sb-items cols-3">
       <div class="sb-item">
-        <div class="sb-label">누적 수주액</div>
-        <div class="sb-val">1,005<span class="sb-u">억</span></div>
-        <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">평균 29.6억/건</span>
-      </div>
-      <div class="sb-item">
         <div class="sb-label">누적 매출</div>
         <div class="sb-val">597<span class="sb-u">억</span></div>
         <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">전체 79%</span>
+      </div>
+      <div class="sb-item">
+        <div class="sb-label">누적 수주액</div>
+        <div class="sb-val">1,026<span class="sb-u">억</span></div>
+        <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">평균 30.2억/건</span>
       </div>
       <div class="sb-item">
         <div class="sb-label">프로젝트 건수</div>
@@ -1786,7 +1834,7 @@ tr:hover td { background:var(--bg); }
             </div>
             <div class="edit-field">
               <label class="edit-label">구축 수주액 (억)</label>
-              <input class="edit-input" id="kpi_bld_order" type="number" value="1005" placeholder="">
+              <input class="edit-input" id="kpi_bld_order" type="number" value="1026" placeholder="">
             </div>
             <div class="edit-field">
               <label class="edit-label">구축 건수</label>
@@ -3536,7 +3584,16 @@ tr:hover td { background:var(--bg); }
   </div></div>
 
 <script>
-let SEED = {"summary": {"annual": {"labels": ["2022", "2023", "2024", "2025", "2026(~3월)", "누적"], "market": [1020, 1250, 1440, 1650, 367, 5727], "revenue": [50, 277, 178, 251, null, 756], "sub_rev": [null, 12, 37, 93, 18, 160], "bld_rev": [50, 265, 141, 136, 6, 597], "ms": [5, 22, 12, 14, 6, 13], "profit": [-22, -18, -32, -23, -16, -101], "profit_r": [-44.4, -6.6, -18, -9.1, null, -12.6]}, "kpi": {"total_rev": 757, "profit": -101, "ms": 13, "sub_lines": 4624, "sub_clients": 480, "bld_order": 1005, "bld_count": 34, "bld_clients": 34, "base_period": "2026.02 (25년 누적)", "bld_rev_cum": 597, "tag_ms": "", "tag_sub_rev": "", "tag_sub_lines": "", "tag_sub_clients": "", "tag_bld_order": "", "tag_bld_clients": ""}, "note25": {"label": "25년 마감기준", "text": "구독 93억 · 구축 136억 · 합계 229억 · M/S 14%"}}, "subscription": {"products": [{"name": "콜인프라", "lines": 3484, "clients": 446, "avg_lines": 8.97938144329897, "arpu": 4.3, "period": 36, "note": "주력 상품"}, {"name": "AI콜봇", "lines": 449, "clients": 31, "avg_lines": 18.4545454545455, "arpu": 13, "period": 36, "note": "LG전자 전략 수주(ARPU 낮음)"}, {"name": "AI상담지원", "lines": 465, "clients": 57, "avg_lines": 8.29545454545455, "arpu": 4.6, "period": 36, "note": null}, {"name": "AI대화록", "lines": 249, "clients": 16, "avg_lines": 17.3571428571429, "arpu": 0.9, "period": 36, "note": null}], "products_total": {"lines": 4498, "clients": 468}, "monthly": {"labels": ["25.01", "25.02", "25.03", "25.04", "25.05", "25.06", "25.07", "25.08", "25.09", "25.10", "25.11", "25.12", "26.01", "26.02"], "data": {"콜인프라": [76, 85, 122, 118, 114, 109, 88, 489, 71, 228, 151, 103, 86, 67], "AI콜봇": [254, 5, 20, 3, 3, 1, 9, 9, 2, 14, 0, 0, 6, 12], "AI상담지원": [0, 5, 11, 4, 13, 41, 21, 21, 8, 2, 26, 34, 2, 7], "AI대화록": [0, 30, 3, 7, 3, 2, 100, 0, 0, 1, 0, 3, 0, 2], "합계": [330, 125, 156, 132, 133, 153, 218, 519, 81, 245, 177, 140, 94, 88]}}, "industry": [{"name": "제조", "lines": 1208}, {"name": "정보/IT/통신", "lines": 1173}, {"name": "서비스", "lines": 930}, {"name": "유통", "lines": 723}, {"name": "의료", "lines": 142}, {"name": "공공/협회/복지", "lines": 101}, {"name": "교육", "lines": 73}, {"name": "금융/보험", "lines": 67}, {"name": "방송/미디어", "lines": 67}, {"name": "여행/숙박", "lines": 57}, {"name": "건설/부동산/임대", "lines": 30}, {"name": "물류/운수", "lines": 24}, {"name": "요식업", "lines": 15}, {"name": "개인사업자", "lines": 14}, {"name": "환경/에너지/시설", "lines": 10}, {"name": "법률/회계", "lines": 6}, {"name": "법률/세무", "lines": 5}, {"name": "통신업", "lines": 4}]}, "buildup": {"pipeline": {"label": "2026(~3월)", "order": 120, "count": 8}, "annual": {"labels": ["2021", "2022", "2023", "2024", "2025", "2026", "누적"], "order": [18, 271, 265, 189, 266, 14, 1026], "revenue": [null, 50, 264, 141, 136, 6, 597], "count": [1, 4, 5, 12, 11, 2, 34]}, "industry": [{"name": "금융", "count": 23, "amount": 749}, {"name": "제조", "count": 3, "amount": 23}, {"name": "서비스", "count": 4, "amount": 54}, {"name": "유통", "count": 1, "amount": 31}, {"name": "교육", "count": 1, "amount": 3}], "contracts": [{"year": 2021, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "상담품질", "amount": 18, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "콜봇", "amount": 36, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB금융그룹(8개)", "content": "FCC", "amount": 212, "note": "★최대"}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협은행", "content": "상담품질", "amount": 5, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB카드", "content": "FCC대응개발", "amount": 18, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한은행", "content": "AICC인프라/STT/TA", "amount": 226, "note": "★최대"}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "생명보험사", "content": "FCC대응개발", "amount": 8, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB손해보험", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2023, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC인프라/AI콜봇", "amount": 19, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "동양생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "하나증권", "content": "AICC인프라/STT/sLLM", "amount": 27, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "유비케어", "content": "STT/KMS", "amount": 7, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB라이프생명", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AICC연동개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저", "amount": 21, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "모두투어", "content": "AICC인프라/STT", "amount": 9, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "피앤피시큐어", "content": "AICC인프라", "amount": 16, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB국민은행 등", "content": "챗봇", "amount": 17, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AI상품봇", "amount": 36, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저추가개발", "amount": 1, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "산은캐피탈", "content": "AICC인프라", "amount": 40, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "챗봇", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "마이브라운", "content": "AICC인프라", "amount": 4, "note": null}, {"year": 2025, "group": "기업고객", "sector": "서비스", "sub": "", "client": "에스원", "content": "AICC인프라/STT", "amount": 23, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "AICC인프라/STT", "amount": 13, "note": null}, {"year": 2025, "group": "기업고객", "sector": "유통", "sub": "", "client": "쿠팡", "content": "AICC인프라/STT", "amount": 31, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리투자증권", "content": "AICC인프라/STT/TA/KMS", "amount": 20, "note": null}, {"year": 2025, "group": "기업고객", "sector": "교육", "sub": "", "client": "크레버스", "content": "AICC인프라/STT", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "SBI저축은행", "content": "AICC인프라/STT", "amount": 17, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "KMS", "amount": 2, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC연동개발", "amount": 1, "note": null}]}, "channel": {"annual": {"labels": ["~24년", "25년", "26년(1~3월)", "누적"], "direct": [500, 590, 1321, 2492], "indirect": [33, 910, 1088, 2187]}, "by_product": [{"product": "콜인프라", "channel": "직접", "y24_lines": 500, "y24_pct": 1, "y25_lines": 212, "y25_pct": 0.2, "y26_lines": 903, "y26_pct": 0.51, "total_lines": 1665, "total_pct": 0.48}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 842, "y25_pct": 0.8, "y26_lines": 851, "y26_pct": 0.49, "total_lines": 1819, "total_pct": 0.52}, {"product": "AI대화록", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 87, "y25_pct": 0.91, "y26_lines": 42, "y26_pct": 0.28, "total_lines": 131, "total_pct": 0.52}, {"product": "", "channel": "간접", "y24_lines": 2, "y24_pct": 1, "y25_lines": 9, "y25_pct": 0.09, "y26_lines": 107, "y26_pct": 0.72, "total_lines": 119, "total_pct": 0.48}, {"product": "AI상담지원", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 183, "y25_pct": 0.77, "y26_lines": 71, "y26_pct": 0.38, "total_lines": 260, "total_pct": 0.56}, {"product": "", "channel": "간접", "y24_lines": 31, "y24_pct": 1, "y25_lines": 56, "y25_pct": 0.23, "y26_lines": 115, "y26_pct": 0.62, "total_lines": 205, "total_pct": 0.44}, {"product": "AI콜봇", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 108, "y25_pct": 0.97, "y26_lines": 305, "y26_pct": 0.95, "total_lines": 425, "total_pct": 0.94}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 3, "y25_pct": 0.15, "y26_lines": 15, "y26_pct": 0.05, "total_lines": 25, "total_pct": 0.06}, {"product": "계", "channel": "직접", "y24_lines": 500, "y24_pct": 0.94, "y25_lines": 590, "y25_pct": 0.39, "y26_lines": 1321, "y26_pct": 0.55, "total_lines": 2481, "total_pct": 0.53}, {"product": "", "channel": "간접", "y24_lines": 33, "y24_pct": 0.06, "y25_lines": 910, "y25_pct": 0.61, "y26_lines": 1088, "y26_pct": 0.45, "total_lines": 2168, "total_pct": 0.47}], "dealers": [{"region": "강남", "no": 1, "name": "엑티브아이티(주)", "product": "AI대화록+콜인프라", "y25_cum": 57, "m2601": 2, "m2602": 2, "m2603": 0, "y26_sum": 4}, {"region": "강남", "no": 2, "name": "주식회사디컴스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 20, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 3, "name": "(주)미디네트웍스", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 4, "name": "(주)세인엔에스", "product": "AI상담지원+콜인프라", "y25_cum": 43, "m2601": 5, "m2602": 0, "m2603": 0, "y26_sum": 5}, {"region": "강남", "no": 5, "name": "(주)아이에스넷", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 6, "name": "(주)엠트리네트웍스", "product": "콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 7, "name": "(주)예원네트웍스", "product": "AI대화록+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 8, "name": "(주)유클라우드", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 9, "name": "(주)주연전자서비스", "product": "AI콜봇+콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 10, "name": "(주)지디네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 8, "m2602": 0, "m2603": 0, "y26_sum": 8}, {"region": "강남", "no": 11, "name": "(주)현승솔루션", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 12, "name": "스피드통신시스템", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 13, "name": "오케이엔이티", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 14, "name": "주식회사 드레니", "product": "AI상담지원+콜인프라", "y25_cum": 68, "m2601": 0, "m2602": 1, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 15, "name": "주식회사 이알에프", "product": "콜인프라", "y25_cum": 12, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 16, "name": "주식회사 탑컴", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 17, "name": "주식회사 텔컴스", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 18, "name": "(주)엑스파워네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 0, "m2602": 19, "m2603": 0, "y26_sum": 19}, {"region": "강북", "no": 19, "name": "(주)텔몬", "product": "AI상담지원+콜인프라", "y25_cum": 147, "m2601": 22, "m2602": 25, "m2603": 5, "y26_sum": 52}, {"region": "강북", "no": 20, "name": "정현에프엠씨", "product": "AI대화록+AI상담지원+AI콜봇+콜인프라", "y25_cum": 179, "m2601": 10, "m2602": 3, "m2603": 1, "y26_sum": 14}, {"region": "강북", "no": 21, "name": "주식회사 비플", "product": "AI대화록+AI상담지원+콜인프라", "y25_cum": 170, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 22, "name": "주식회사 티넷텔레콤", "product": "AI상담지원+콜인프라", "y25_cum": 33, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 23, "name": "씨앤엔", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 24, "name": "(주)베가네트웍스", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 25, "name": "(주)이룸솔루션", "product": "AI상담지원+콜인프라", "y25_cum": 0, "m2601": 2, "m2602": 0, "m2603": 0, "y26_sum": 2}, {"region": "강북", "no": 26, "name": "(주)지앤아이테크", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 27, "name": "메트로넷", "product": "콜인프라", "y25_cum": 15, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 28, "name": "에스티", "product": "AI콜봇+콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 29, "name": "예스라인정보통신", "product": "콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 8, "y26_sum": 8}, {"region": "강북", "no": 30, "name": "위고위드", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 31, "name": "주식회사 비앤애프", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 32, "name": "케이엘네트웍스", "product": "AI콜봇+콜인프라", "y25_cum": 39, "m2601": 0, "m2602": 0, "m2603": 13, "y26_sum": 13}, {"region": "강북", "no": 33, "name": "파워비스", "product": "AI대화록+콜인프라", "y25_cum": 71, "m2601": 0, "m2602": 0, "m2603": 1, "y26_sum": 1}, {"region": "솔루션", "no": 34, "name": "(주)브이원정보통신", "product": "AI콜봇+콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 35, "name": "(주)온파워네트웍스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 35, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 36, "name": "(주)플러스비즈", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 37, "name": "주식회사 아이티윈드", "product": "콜인프라", "y25_cum": 11, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 38, "name": "다원IT", "product": "콜인프라", "y25_cum": 0, "m2601": 3, "m2602": 0, "m2603": 0, "y26_sum": 3}, {"region": "동부", "no": 39, "name": "(주)아진정보통신", "product": "콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 40, "name": "스피드정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 41, "name": "이지네트워크", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 42, "name": "(주)닮커뮤니케이션", "product": "콜인프라", "y25_cum": 5, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 43, "name": "(주)쓰리에스정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "서부", "no": 44, "name": "비즈프로", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 45, "name": "제이엠네트웍스", "product": "AI상담지원+콜인프라", "y25_cum": 28, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}], "dealer_headers": {"m01": "26.01", "m02": "26.02", "m03": "26.03"}}, "competitor": {"labels": ["2024", "2025", "2026 (예상)", "-", "-"], "data": {"LG U+": {"annual": [178, 229, 352, 0, 0], "total": 759, "ms": 0.29683222526398123}, "KT": {"annual": [275, 423, 718, 0, 0], "total": 1416, "ms": 0.5537739538521705}, "SKT": {"annual": [98, 113, 171, 0, 0], "total": 382, "ms": 0.14939382088384826}, "합계": {"annual": [551, 765, 1241, 0, 0], "total": 2557}}, "kt_notes": [{"client": "하나은행/카드", "year": 2021, "amount": 150, "note": null}, {"client": "신한금융지주", "year": 2021, "amount": 200, "note": null}, {"client": "한국교직원공제회", "year": 2024, "amount": 120, "note": null}, {"client": "NH농협은행", "year": 2025, "amount": 350, "note": "25년 최대"}]}, "top10": {"AI콜봇": [{"name": "LG전자", "lines": 251}, {"name": "(주)안랩", "lines": 66}, {"name": "(주)경동나비엔", "lines": 33}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 5}, {"name": "(주)아크도", "lines": 3}, {"name": "엠지신용정보(주)", "lines": 3}, {"name": "(주)모빌리티시스템스", "lines": 2}, {"name": "(주)미디어로그", "lines": 2}, {"name": "(주)주연테크", "lines": 2}], "AI상담지원": [{"name": "(주)티오더", "lines": 98}, {"name": "(주)코스모안컴퍼니", "lines": 26}, {"name": "비앤빛 강남밝은세상안과", "lines": 25}, {"name": "(재)경기도여성가족재단", "lines": 20}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 15}, {"name": "주식회사 미트박스글로벌", "lines": 13}, {"name": "(주)가비아씨앤에스", "lines": 10}, {"name": "에스케이이스피드메이트", "lines": 10}, {"name": "주식회사 비플", "lines": 10}], "AI대화록": [{"name": "주식회사 비플", "lines": 100}, {"name": "(주)티오더", "lines": 83}, {"name": "프레시원주식회사", "lines": 30}, {"name": "(주)아워홈", "lines": 4}, {"name": "주식회사 하이클린", "lines": 4}, {"name": "(사단)개인정보보호협회", "lines": 4}, {"name": "닥터마틴에어웨어코리아", "lines": 3}, {"name": "둔산속편한내과영상의학과", "lines": 3}, {"name": "정현에프엠씨(주)", "lines": 3}, {"name": "(주)세인엔에스", "lines": 2}], "콜인프라": [{"name": "주식회사 비플", "lines": 170}, {"name": "정현에프엠씨", "lines": 148}, {"name": "(주)텔몬", "lines": 147}, {"name": "파워비스", "lines": 71}, {"name": "주식회사 드레니", "lines": 68}, {"name": "케이엘네트웍스", "lines": 39}, {"name": "(주)엑스파워네트웍스", "lines": 31}, {"name": "(주)지디네트웍스", "lines": 31}, {"name": "(주)지앤아이테크", "lines": 8}, {"name": "스피드통신시스템", "lines": 8}]}};
+const _AI_CONFIG = {
+  apiKey: 'AIzaSyCc-7EqiV276xDKTetqbZvgCl2GDRpv2MU',
+  model: 'gemini-2.0-flash'
+};
+
+const _SHEETS_CONFIG = {
+  url: 'https://script.google.com/macros/s/AKfycbxLVRzlQ8gd8Go-8C2xmEa02_JFFRCdISfbYA4dzPabnryysNHbaNrJHErgw0Kfo1qe2Q/exec'
+};
+
+let SEED = {"summary": {"annual": {"labels": ["2022", "2023", "2024", "2025", "2026(~3월)", "누적"], "market": [1020, 1250, 1440, 1650, 367, 5727], "revenue": [50, 277, 178, 251, null, 756], "sub_rev": [null, 12, 37, 93, 18, 160], "bld_rev": [50, 265, 141, 136, 6, 597], "ms": [5, 22, 12, 14, 6, 13], "profit": [-22, -18, -32, -23, -16, -101], "profit_r": [-44.4, -6.6, -18, -9.1, null, -12.6]}, "kpi": {"total_rev": 757, "profit": -101, "ms": 13, "sub_lines": 4624, "sub_clients": 480, "bld_order": 1026, "bld_count": 34, "bld_clients": 34, "base_period": "2026.02 (25년 누적)", "bld_rev_cum": 597, "tag_ms": "", "tag_sub_rev": "", "tag_sub_lines": "", "tag_sub_clients": "", "tag_bld_order": "", "tag_bld_clients": ""}, "note25": {"label": "25년 마감기준", "text": "구독 93억 · 구축 136억 · 합계 229억 · M/S 14%"}}, "subscription": {"products": [{"name": "콜인프라", "lines": 3484, "clients": 446, "avg_lines": 8.97938144329897, "arpu": 4.3, "period": 36, "note": "주력 상품"}, {"name": "AI콜봇", "lines": 449, "clients": 31, "avg_lines": 18.4545454545455, "arpu": 13, "period": 36, "note": "LG전자 전략 수주(ARPU 낮음)"}, {"name": "AI상담지원", "lines": 465, "clients": 57, "avg_lines": 8.29545454545455, "arpu": 4.6, "period": 36, "note": null}, {"name": "AI대화록", "lines": 249, "clients": 16, "avg_lines": 17.3571428571429, "arpu": 0.9, "period": 36, "note": null}], "products_total": {"lines": 4498, "clients": 468}, "monthly": {"labels": ["25.01", "25.02", "25.03", "25.04", "25.05", "25.06", "25.07", "25.08", "25.09", "25.10", "25.11", "25.12", "26.01", "26.02"], "data": {"콜인프라": [76, 85, 122, 118, 114, 109, 88, 489, 71, 228, 151, 103, 86, 67], "AI콜봇": [254, 5, 20, 3, 3, 1, 9, 9, 2, 14, 0, 0, 6, 12], "AI상담지원": [0, 5, 11, 4, 13, 41, 21, 21, 8, 2, 26, 34, 2, 7], "AI대화록": [0, 30, 3, 7, 3, 2, 100, 0, 0, 1, 0, 3, 0, 2], "합계": [330, 125, 156, 132, 133, 153, 218, 519, 81, 245, 177, 140, 94, 88]}}, "industry": [{"name": "제조", "lines": 1208}, {"name": "정보/IT/통신", "lines": 1173}, {"name": "서비스", "lines": 930}, {"name": "유통", "lines": 723}, {"name": "의료", "lines": 142}, {"name": "공공/협회/복지", "lines": 101}, {"name": "교육", "lines": 73}, {"name": "금융/보험", "lines": 67}, {"name": "방송/미디어", "lines": 67}, {"name": "여행/숙박", "lines": 57}, {"name": "건설/부동산/임대", "lines": 30}, {"name": "물류/운수", "lines": 24}, {"name": "요식업", "lines": 15}, {"name": "개인사업자", "lines": 14}, {"name": "환경/에너지/시설", "lines": 10}, {"name": "법률/회계", "lines": 6}, {"name": "법률/세무", "lines": 5}, {"name": "통신업", "lines": 4}]}, "buildup": {"pipeline": {"label": "2026(~3월)", "order": 120, "count": 8}, "annual": {"labels": ["2021", "2022", "2023", "2024", "2025", "2026", "누적"], "order": [18, 271, 265, 189, 266, 14, 1026], "revenue": [null, 50, 264, 141, 136, 6, 597], "count": [1, 4, 5, 12, 11, 2, 34]}, "industry": [{"name": "금융", "count": 23, "amount": 749}, {"name": "제조", "count": 3, "amount": 23}, {"name": "서비스", "count": 4, "amount": 54}, {"name": "유통", "count": 1, "amount": 31}, {"name": "교육", "count": 1, "amount": 3}], "contracts": [{"year": 2021, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "상담품질", "amount": 18, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "콜봇", "amount": 36, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB금융그룹(8개)", "content": "FCC", "amount": 212, "note": "★최대"}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협은행", "content": "상담품질", "amount": 5, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB카드", "content": "FCC대응개발", "amount": 18, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한은행", "content": "AICC인프라/STT/TA", "amount": 226, "note": "★최대"}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "생명보험사", "content": "FCC대응개발", "amount": 8, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB손해보험", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2023, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC인프라/AI콜봇", "amount": 19, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "동양생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "하나증권", "content": "AICC인프라/STT/sLLM", "amount": 27, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "유비케어", "content": "STT/KMS", "amount": 7, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB라이프생명", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AICC연동개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저", "amount": 21, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "모두투어", "content": "AICC인프라/STT", "amount": 9, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "피앤피시큐어", "content": "AICC인프라", "amount": 16, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB국민은행 등", "content": "챗봇", "amount": 17, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AI상품봇", "amount": 36, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저추가개발", "amount": 1, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "산은캐피탈", "content": "AICC인프라", "amount": 40, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "챗봇", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "마이브라운", "content": "AICC인프라", "amount": 4, "note": null}, {"year": 2025, "group": "기업고객", "sector": "서비스", "sub": "", "client": "에스원", "content": "AICC인프라/STT", "amount": 23, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "AICC인프라/STT", "amount": 13, "note": null}, {"year": 2025, "group": "기업고객", "sector": "유통", "sub": "", "client": "쿠팡", "content": "AICC인프라/STT", "amount": 31, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리투자증권", "content": "AICC인프라/STT/TA/KMS", "amount": 20, "note": null}, {"year": 2025, "group": "기업고객", "sector": "교육", "sub": "", "client": "크레버스", "content": "AICC인프라/STT", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "SBI저축은행", "content": "AICC인프라/STT", "amount": 17, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "KMS", "amount": 2, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC연동개발", "amount": 1, "note": null}]}, "channel": {"annual": {"labels": ["~24년", "25년", "26년(1~3월)", "누적"], "direct": [500, 590, 1321, 2492], "indirect": [33, 910, 1088, 2187]}, "by_product": [{"product": "콜인프라", "channel": "직접", "y24_lines": 500, "y24_pct": 1, "y25_lines": 212, "y25_pct": 0.2, "y26_lines": 903, "y26_pct": 0.51, "total_lines": 1665, "total_pct": 0.48}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 842, "y25_pct": 0.8, "y26_lines": 851, "y26_pct": 0.49, "total_lines": 1819, "total_pct": 0.52}, {"product": "AI대화록", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 87, "y25_pct": 0.91, "y26_lines": 42, "y26_pct": 0.28, "total_lines": 131, "total_pct": 0.52}, {"product": "", "channel": "간접", "y24_lines": 2, "y24_pct": 1, "y25_lines": 9, "y25_pct": 0.09, "y26_lines": 107, "y26_pct": 0.72, "total_lines": 119, "total_pct": 0.48}, {"product": "AI상담지원", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 183, "y25_pct": 0.77, "y26_lines": 71, "y26_pct": 0.38, "total_lines": 260, "total_pct": 0.56}, {"product": "", "channel": "간접", "y24_lines": 31, "y24_pct": 1, "y25_lines": 56, "y25_pct": 0.23, "y26_lines": 115, "y26_pct": 0.62, "total_lines": 205, "total_pct": 0.44}, {"product": "AI콜봇", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 108, "y25_pct": 0.97, "y26_lines": 305, "y26_pct": 0.95, "total_lines": 425, "total_pct": 0.94}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 3, "y25_pct": 0.15, "y26_lines": 15, "y26_pct": 0.05, "total_lines": 25, "total_pct": 0.06}, {"product": "계", "channel": "직접", "y24_lines": 500, "y24_pct": 0.94, "y25_lines": 590, "y25_pct": 0.39, "y26_lines": 1321, "y26_pct": 0.55, "total_lines": 2481, "total_pct": 0.53}, {"product": "", "channel": "간접", "y24_lines": 33, "y24_pct": 0.06, "y25_lines": 910, "y25_pct": 0.61, "y26_lines": 1088, "y26_pct": 0.45, "total_lines": 2168, "total_pct": 0.47}], "dealers": [{"region": "강남", "no": 1, "name": "엑티브아이티(주)", "product": "AI대화록+콜인프라", "y25_cum": 57, "m2601": 2, "m2602": 2, "m2603": 0, "y26_sum": 4}, {"region": "강남", "no": 2, "name": "주식회사디컴스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 20, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 3, "name": "(주)미디네트웍스", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 4, "name": "(주)세인엔에스", "product": "AI상담지원+콜인프라", "y25_cum": 43, "m2601": 5, "m2602": 0, "m2603": 0, "y26_sum": 5}, {"region": "강남", "no": 5, "name": "(주)아이에스넷", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 6, "name": "(주)엠트리네트웍스", "product": "콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 7, "name": "(주)예원네트웍스", "product": "AI대화록+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 8, "name": "(주)유클라우드", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 9, "name": "(주)주연전자서비스", "product": "AI콜봇+콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 10, "name": "(주)지디네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 8, "m2602": 0, "m2603": 0, "y26_sum": 8}, {"region": "강남", "no": 11, "name": "(주)현승솔루션", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 12, "name": "스피드통신시스템", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 13, "name": "오케이엔이티", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 14, "name": "주식회사 드레니", "product": "AI상담지원+콜인프라", "y25_cum": 68, "m2601": 0, "m2602": 1, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 15, "name": "주식회사 이알에프", "product": "콜인프라", "y25_cum": 12, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 16, "name": "주식회사 탑컴", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 17, "name": "주식회사 텔컴스", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 18, "name": "(주)엑스파워네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 0, "m2602": 19, "m2603": 0, "y26_sum": 19}, {"region": "강북", "no": 19, "name": "(주)텔몬", "product": "AI상담지원+콜인프라", "y25_cum": 147, "m2601": 22, "m2602": 25, "m2603": 5, "y26_sum": 52}, {"region": "강북", "no": 20, "name": "정현에프엠씨", "product": "AI대화록+AI상담지원+AI콜봇+콜인프라", "y25_cum": 179, "m2601": 10, "m2602": 3, "m2603": 1, "y26_sum": 14}, {"region": "강북", "no": 21, "name": "주식회사 비플", "product": "AI대화록+AI상담지원+콜인프라", "y25_cum": 170, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 22, "name": "주식회사 티넷텔레콤", "product": "AI상담지원+콜인프라", "y25_cum": 33, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 23, "name": "씨앤엔", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 24, "name": "(주)베가네트웍스", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 25, "name": "(주)이룸솔루션", "product": "AI상담지원+콜인프라", "y25_cum": 0, "m2601": 2, "m2602": 0, "m2603": 0, "y26_sum": 2}, {"region": "강북", "no": 26, "name": "(주)지앤아이테크", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 27, "name": "메트로넷", "product": "콜인프라", "y25_cum": 15, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 28, "name": "에스티", "product": "AI콜봇+콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 29, "name": "예스라인정보통신", "product": "콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 8, "y26_sum": 8}, {"region": "강북", "no": 30, "name": "위고위드", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 31, "name": "주식회사 비앤애프", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 32, "name": "케이엘네트웍스", "product": "AI콜봇+콜인프라", "y25_cum": 39, "m2601": 0, "m2602": 0, "m2603": 13, "y26_sum": 13}, {"region": "강북", "no": 33, "name": "파워비스", "product": "AI대화록+콜인프라", "y25_cum": 71, "m2601": 0, "m2602": 0, "m2603": 1, "y26_sum": 1}, {"region": "솔루션", "no": 34, "name": "(주)브이원정보통신", "product": "AI콜봇+콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 35, "name": "(주)온파워네트웍스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 35, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 36, "name": "(주)플러스비즈", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 37, "name": "주식회사 아이티윈드", "product": "콜인프라", "y25_cum": 11, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 38, "name": "다원IT", "product": "콜인프라", "y25_cum": 0, "m2601": 3, "m2602": 0, "m2603": 0, "y26_sum": 3}, {"region": "동부", "no": 39, "name": "(주)아진정보통신", "product": "콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 40, "name": "스피드정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 41, "name": "이지네트워크", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 42, "name": "(주)닮커뮤니케이션", "product": "콜인프라", "y25_cum": 5, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 43, "name": "(주)쓰리에스정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "서부", "no": 44, "name": "비즈프로", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 45, "name": "제이엠네트웍스", "product": "AI상담지원+콜인프라", "y25_cum": 28, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}], "dealer_headers": {"m01": "26.01", "m02": "26.02", "m03": "26.03"}}, "competitor": {"labels": ["2024", "2025", "2026 (예상)", "-", "-"], "data": {"LG U+": {"annual": [178, 229, 352, 0, 0], "total": 759, "ms": 0.29683222526398123}, "KT": {"annual": [275, 423, 718, 0, 0], "total": 1416, "ms": 0.5537739538521705}, "SKT": {"annual": [98, 113, 171, 0, 0], "total": 382, "ms": 0.14939382088384826}, "합계": {"annual": [551, 765, 1241, 0, 0], "total": 2557}}, "kt_notes": [{"client": "하나은행/카드", "year": 2021, "amount": 150, "note": null}, {"client": "신한금융지주", "year": 2021, "amount": 200, "note": null}, {"client": "한국교직원공제회", "year": 2024, "amount": 120, "note": null}, {"client": "NH농협은행", "year": 2025, "amount": 350, "note": "25년 최대"}]}, "top10": {"AI콜봇": [{"name": "LG전자", "lines": 251}, {"name": "(주)안랩", "lines": 66}, {"name": "(주)경동나비엔", "lines": 33}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 5}, {"name": "(주)아크도", "lines": 3}, {"name": "엠지신용정보(주)", "lines": 3}, {"name": "(주)모빌리티시스템스", "lines": 2}, {"name": "(주)미디어로그", "lines": 2}, {"name": "(주)주연테크", "lines": 2}], "AI상담지원": [{"name": "(주)티오더", "lines": 98}, {"name": "(주)코스모안컴퍼니", "lines": 26}, {"name": "비앤빛 강남밝은세상안과", "lines": 25}, {"name": "(재)경기도여성가족재단", "lines": 20}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 15}, {"name": "주식회사 미트박스글로벌", "lines": 13}, {"name": "(주)가비아씨앤에스", "lines": 10}, {"name": "에스케이이스피드메이트", "lines": 10}, {"name": "주식회사 비플", "lines": 10}], "AI대화록": [{"name": "주식회사 비플", "lines": 100}, {"name": "(주)티오더", "lines": 83}, {"name": "프레시원주식회사", "lines": 30}, {"name": "(주)아워홈", "lines": 4}, {"name": "주식회사 하이클린", "lines": 4}, {"name": "(사단)개인정보보호협회", "lines": 4}, {"name": "닥터마틴에어웨어코리아", "lines": 3}, {"name": "둔산속편한내과영상의학과", "lines": 3}, {"name": "정현에프엠씨(주)", "lines": 3}, {"name": "(주)세인엔에스", "lines": 2}], "콜인프라": [{"name": "주식회사 비플", "lines": 170}, {"name": "정현에프엠씨", "lines": 148}, {"name": "(주)텔몬", "lines": 147}, {"name": "파워비스", "lines": 71}, {"name": "주식회사 드레니", "lines": 68}, {"name": "케이엘네트웍스", "lines": 39}, {"name": "(주)엑스파워네트웍스", "lines": 31}, {"name": "(주)지디네트웍스", "lines": 31}, {"name": "(주)지앤아이테크", "lines": 8}, {"name": "스피드통신시스템", "lines": 8}]}};
 let D = JSON.parse(JSON.stringify(SEED));
 
 /* ── KPI Mock 데이터 ── */
@@ -3619,6 +3676,7 @@ function go(name,btn){
   document.getElementById('p-'+name).classList.add('on');
   btn.classList.add('on');
   buildPage(name);
+  _renderCachedInsight(name);
 }
 function rebuildAll(){
   const name=document.querySelector('.tb.on')?.getAttribute('onclick')?.match(/go\('(\w+)'/)?.[1]||'ov';
@@ -3704,14 +3762,14 @@ function buildSummaryBlock(id, kpi, an){
     <div class="sb-header" style="background:#4B4BAD">🏗️ 구축형 종합</div>
     <div class="sb-items cols-3">
       <div class="sb-item">
-        <div class="sb-label">누적 수주액</div>
-        <div class="sb-val">${fmt(kpi.bld_order)}<span class="sb-u">억</span></div>
-        <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">${kpi.tag_bld_order||('평균 '+Math.round((kpi.bld_order||0)/(kpi.bld_count||1)*10)/10+'억/건')}</span>
-      </div>
-      <div class="sb-item">
         <div class="sb-label">누적 매출</div>
         <div class="sb-val">${fmt(kpi.bld_rev_cum||bldRev)}<span class="sb-u">억</span></div>
         <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">전체 ${Math.round((kpi.bld_rev_cum||bldRev)/(kpi.total_rev||1)*100)}%</span>
+      </div>
+      <div class="sb-item">
+        <div class="sb-label">누적 수주액</div>
+        <div class="sb-val">${fmt(kpi.bld_order)}<span class="sb-u">억</span></div>
+        <span class="sb-tag" style="background:var(--green-bg);color:var(--green)">${kpi.tag_bld_order||('평균 '+Math.round((kpi.bld_order||0)/(kpi.bld_count||1)*10)/10+'억/건')}</span>
       </div>
       <div class="sb-item">
         <div class="sb-label">프로젝트 건수</div>
@@ -3732,6 +3790,8 @@ function buildOv(){
   const el=document.getElementById('p-ov');
   el.innerHTML=`
   <div class="summary-block" id="sb-ov"></div>
+  <div class="ai-placeholder" id="ai-insight-ov">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
+  <div class="ai-placeholder" id="ai-market-ov">📊 인사이트 분석을 눌러 최신 시장 동향을 확인하세요</div>
 
   <div class="stitle">📈 연도별 매출 추이 <span class="sub">구독(하단) · 구축(상단) 누적막대 · M/S%</span></div>
   <div class="box" style="margin-bottom:22px;">
@@ -3774,76 +3834,7 @@ function buildOv(){
   <div class="stitle">🏆 AICC상품별 Top10 고객사 및 대리점채널 Top10 <span class="sub">('22~'25) 회선수 기준</span></div>
   <div class="top10-grid" id="top10-grid"></div>
 
-  <div style="margin-top:24px;">
-    <div class="stitle">🎯 KPI 달성 현황 <span class="sub">목표 대비 현재 달성률</span></div>
-    <div class="g3">
-      ${(D.kpi&&D.kpi.items||[]).length>0 ? D.kpi.items.map((item,idx)=>{
-        const ratio=item.target>0?item.current/item.target:0;
-        const pct=(ratio*100).toFixed(0);
-        const cIds=['gauge-rrms','gauge-ka','gauge-bld'];
-        const units={'%':'%','건':'건','억':'억'};
-        const valDisplay=item.unit==='%'?item.current.toFixed(2):item.unit==='억'?fmt(item.current):String(item.current);
-        const tgtDisplay=item.unit==='%'?item.target.toFixed(2)+'%':item.unit==='억'?fmt(item.target)+'억':item.target+item.unit;
-        return `<div class="box" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
-          <div style="font-size:12px;color:var(--dim);font-weight:700;margin-bottom:12px;width:100%;text-align:left;">${item.name}</div>
-          <canvas id="${cIds[idx]}" width="240" height="240" style="width:120px;height:120px;margin:0 auto 12px;"></canvas>
-          <div style="font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text);">${valDisplay}<span style="font-size:15px;font-weight:400;color:var(--dim);margin-left:2px;">${item.unit}</span></div>
-          <div style="display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--dim);margin-top:8px;">목표 ${tgtDisplay}</div>
-        </div>`;
-      }).join('') : `<div class="box" style="grid-column:1/-1;text-align:center;padding:40px 20px;">
-        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;">KPI 데이터가 없습니다</div>
-        <div style="font-size:12px;color:var(--dim);">수정 탭에서 KPI 데이터를 입력하세요</div>
-      </div>`}
-    </div>
-  </div>
   `;
-
-  /* ── KPI 달성 게이지 ── */
-  function drawGauge(canvasId, ratio, color){
-    const cvs=document.getElementById(canvasId);
-    if(!cvs)return;
-    const ctx=cvs.getContext('2d');
-    const dpr=window.devicePixelRatio||1;
-    cvs.width=120*dpr;
-    cvs.height=120*dpr;
-    ctx.scale(dpr,dpr);
-    const cx=60,cy=70,r=48,lw=10;
-    const clampedRatio=Math.min(Math.max(ratio,0),1.5);
-    const fillAngle=Math.PI+(clampedRatio*Math.PI);
-    // track
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,Math.PI,0,false);
-    ctx.lineWidth=lw;
-    ctx.lineCap='round';
-    ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border').trim()||'#e2e5ea';
-    ctx.stroke();
-    // filled arc
-    if(ratio>0){
-      ctx.beginPath();
-      ctx.arc(cx,cy,r,Math.PI,Math.min(fillAngle,2*Math.PI),false);
-      ctx.lineWidth=lw;
-      ctx.lineCap='round';
-      ctx.strokeStyle=color;
-      ctx.stroke();
-    }
-    // center text
-    const pct=(ratio*100).toFixed(0)+'%';
-    ctx.font="bold 15px 'DM Mono',monospace";
-    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#111827';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(pct,cx,cy-4);
-  }
-
-  // Render KPI gauges
-  if(D.kpi&&D.kpi.items&&D.kpi.items.length>0){
-    const accentColor=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim()||'#2D2D6B';
-    const gaugeIds=['gauge-rrms','gauge-ka','gauge-bld'];
-    D.kpi.items.forEach((item,i)=>{
-      const ratio=item.target>0?item.current/item.target:0;
-      drawGauge(gaugeIds[i],ratio,accentColor);
-    });
-  }
 
   buildSummaryBlock('sb-ov', kpi, an);
 
@@ -4460,6 +4451,7 @@ function buildSub(){
   const el=document.getElementById('p-sub');
   el.innerHTML=`
   <div class="kgrid" id="k-sub"></div>
+  <div class="ai-placeholder" id="ai-insight-sub">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
   <div class="stitle">상품별 실적</div>
   <div class="g4" id="pg-sub"></div>
   <div class="stitle">월별 유치 추이 · 누적 가입자</div>
@@ -4787,6 +4779,7 @@ function buildBld(){
   const el=document.getElementById('p-bld');
   el.innerHTML=`
   <div class="kgrid" id="k-bld"></div>
+  <div class="ai-placeholder" id="ai-insight-bld">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
   <div class="stitle">연도별 수주 현황</div>
   <div class="g2" style="margin-bottom:20px;">
     <div class="box" style="display:flex;flex-direction:column;">
@@ -4989,6 +4982,7 @@ function buildCh(){
   const el=document.getElementById('p-ch');
   el.innerHTML=`
   <div class="kgrid" id="k-ch"></div>
+  <div class="ai-placeholder" id="ai-insight-ch">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
   <div class="g2">
     <div class="box"><div class="btitle">연도별 직접/간접 채널 현황</div><div class="bsub">회선수</div>
       <div style="height:220px"><canvas id="c-ca"></canvas></div></div>
@@ -5098,6 +5092,7 @@ function buildComp(){
   const el=document.getElementById('p-comp');
   el.innerHTML=`
   <div class="kgrid" id="k-comp"></div>
+  <div class="ai-placeholder" id="ai-insight-comp">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
   <div class="g2">
     <div class="box"><div class="btitle">연도별 수주액 비교 (억원)</div><div class="bsub">U+ vs KT vs SKT</div>
       <div style="height:240px"><canvas id="c-comp"></canvas></div></div>
@@ -5485,6 +5480,7 @@ function buildKpi(){
   <div class="kpi-section" id="kn-section">
     <div class="kpi-sec-label">KPI 실적 현황</div>
     <div class="kpi-grid-new" id="kn-grid"></div>
+    <div class="ai-placeholder" id="ai-insight-kpi">📊 인사이트 분석을 눌러 분석 결과를 확인하세요</div>
     <div class="kn-hint"><div class="kn-hint-inner"><div class="kn-hint-icon">↓</div>카드를 클릭하면 KPI 정의 및 등급 기준을 확인할 수 있습니다</div></div>
     <div id="kn-panels"></div>
   </div>`;
@@ -6026,6 +6022,18 @@ function buildEdit(){
       </div>
     </div>
 
+    <!-- Sheets 저장 & 배포 -->
+    <div class="edit-section">
+      <div class="edit-sh">📤 Sheets 저장 & 배포</div>
+      <div class="edit-body">
+        <div style="display:flex;gap:10px;">
+          <button class="edbtn-pink" onclick="saveToSheets()">📤 실적데이터 + 인사이트 저장</button>
+          <span id="sheets-status" style="font-size:13px;color:var(--dim);align-self:center;"></span>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">※ 저장 시 현재 실적 데이터와 인사이트 분석 결과가 Google Sheets에 함께 저장됩니다.</div>
+      </div>
+    </div>
+
     <div style="text-align:center;padding:20px;font-size:12px;color:var(--muted);">
       💾 [저장 & 반영] 클릭 시 현재 세션에 데이터가 반영됩니다. JSON 내보내기로 백업하세요.
     </div>
@@ -6439,6 +6447,363 @@ function applyEditData(){
   editToast('✅','저장 & 반영 완료','모든 탭 데이터가 업데이트됐습니다');
 }
 
+
+/* ══════════════════════════════════════
+   인사이트 분석 (전체 탭 일괄)
+══════════════════════════════════════ */
+const _aiCache={timestamp:null,results:{ov:null,kpi:null,sub:null,bld:null,ch:null,comp:null},market1:null,market2:null};
+
+function getGrade(item){
+  const grades=item.grades||[];
+  const val=item.type==='achievement'&&item.target>0?item.current/item.target:item.current;
+  for(const g of grades){if(val>=g.min)return g.grade;}
+  return 'D';
+}
+
+function _kpiBase(){
+  const items=D.kpi?.items||[];
+  const rrms=items.find(i=>i.id==='AICC_RRMS');
+  const ka=items.find(i=>i.id==='AICC_KA_REF');
+  const bld=items.find(i=>i.id==='AICC_BUILD_ORDER');
+  const rate=(it)=>it&&it.target>0?((it.current/it.target)*100).toFixed(0)+'%':'—';
+  return {rrms,ka,bld,rate,
+    rrmsRate:rate(rrms), rrmsGrade:rrms?getGrade(rrms):'—',
+    rrmsVsBase:rrms&&rrms.base!=null?(rrms.current>rrms.base?'상승':'하락'):'—',
+    kaRate:rate(ka), kaGrade:ka?getGrade(ka):'—',
+    bldRate:rate(bld), bldGrade:bld?getGrade(bld):'—'
+  };
+}
+
+function _trendText(){
+  const rev=D.summary.annual.revenue||[], labels=D.summary.annual.labels||[];
+  const parts=[];
+  for(let i=1;i<rev.length;i++){
+    if(rev[i]!=null&&rev[i-1]!=null&&rev[i-1]!==0)
+      parts.push(`${labels[i]}: ${rev[i]>rev[i-1]?'+':''}${(((rev[i]-rev[i-1])/rev[i-1])*100).toFixed(0)}%`);
+  }
+  return parts.join(', ')||'데이터 부족';
+}
+
+function _momText(){
+  const mon=D.subscription?.monthly;
+  if(!mon||!mon.data?.['합계']||mon.data['합계'].length<2)return '데이터 부족';
+  const arr=mon.data['합계'], cur=arr[arr.length-1], prev=arr[arr.length-2];
+  return prev>0?`${cur>prev?'증가':'감소'}(${(((cur-prev)/prev)*100).toFixed(0)}%)`:'—';
+}
+
+function _msText(){
+  const ms=(D.summary.annual.ms||[]).filter(v=>v!=null);
+  return ms.length>0?`최근 ${ms[ms.length-1]}%`:'—';
+}
+
+function _buildAllPrompt(){
+  const k=_kpiBase();
+  const cm=D.kpi?.currentMonth||1;
+  const bldAnn=k.bld&&k.bld.target>0?((k.bld.current/cm*12>=k.bld.target)?'달성 가능':'가속 필요'):'—';
+  const mon=D.subscription?.monthly;
+  let subTrend='—';
+  if(mon&&mon.data?.['합계']?.length>=3){
+    const a=mon.data['합계'], l=a.length;
+    const avg3=(a[l-1]+a[l-2]+a[l-3])/3, avg6=a.slice(Math.max(0,l-6)).reduce((s,v)=>s+v,0)/Math.min(6,l);
+    subTrend=avg3>=avg6?'최근 3개월 상승 추세':'최근 3개월 하락 추세';
+  }
+  const products=(D.subscription?.products||[]).map(p=>`${p.name}: ${p.lines}회선`).join(', ');
+  const bldAn=D.buildup?.annual;
+  const ord=bldAn?.order||[], bLabels=bldAn?.labels||[];
+  const bldTrend=[];
+  for(let i=1;i<ord.length-1;i++){
+    if(ord[i]!=null&&ord[i-1]!=null&&ord[i-1]>0)
+      bldTrend.push(`${bLabels[i]}: ${ord[i]>ord[i-1]?'+':''}${(((ord[i]-ord[i-1])/ord[i-1])*100).toFixed(0)}%`);
+  }
+  const pipe=D.buildup?.pipeline;
+  const chD=D.channel?.annual;
+  const td=chD?.direct?.[3]||0, ti=chD?.indirect?.[3]||0, tt=td+ti;
+  const directPct=tt>0?Math.round(td/tt*100):0;
+  const comp=D.competitor?.data;
+  const up=comp?.['LG U+'], kt=comp?.KT, skt=comp?.SKT;
+  return `AICC 사업 실적을 탭별로 분석해줘 (LG유플러스 내부용). 실제 수치가 아닌 비율/방향/등급만 제공합니다.
+
+[종합현황]
+- RRMS 달성률: ${k.rrmsRate}, 전년 대비 ${k.rrmsVsBase}, 등급 ${k.rrmsGrade}
+- KA 레퍼런스: ${k.kaRate} 달성, 등급 ${k.kaGrade}
+- 구축형 수주: ${k.bldRate} 달성, 등급 ${k.bldGrade}
+- 연도별 매출 증감률: ${_trendText()}
+- 시장 M/S: ${_msText()}
+- 전월 대비 구독 유치: ${_momText()}
+
+[KPI현황]
+- RRMS: ${k.rrmsRate}, 등급 ${k.rrmsGrade}, 전년 대비 ${k.rrmsVsBase}
+- KA: ${k.kaRate}, 등급 ${k.kaGrade}
+- 구축형: ${k.bldRate}, 등급 ${k.bldGrade}
+- 연말 달성 전망: ${bldAnn}
+
+[구독형]
+- 누적 매출 증감률: ${_trendText()}
+- 월별 유치: ${_momText()}, ${subTrend}
+- 상품별 비중: ${products}
+
+[구축형]
+- 수주액 달성률: ${k.bldRate}, 등급 ${k.bldGrade}
+- 연도별 수주 증감: ${bldTrend.join(', ')||'—'}
+- 파이프라인: ${pipe?pipe.label+' '+pipe.order+'억 '+pipe.count+'건':'—'}
+
+[채널현황]
+- 직접영업: ${directPct}%, 간접: ${100-directPct}%
+- 대리점 수: ${(D.channel?.dealers||[]).length}개
+- 26년 간접 유치: ${chD?.indirect?.[2]||0}회선
+
+[경쟁현황]
+- LG U+ M/S: ${up?Math.round(up.ms*100)+'%':'—'}
+- KT M/S: ${kt?Math.round(kt.ms*100)+'%':'—'}
+- SKT M/S: ${skt?Math.round(skt.ms*100)+'%':'—'}
+- LG U+ 포지션: ${up&&kt?(up.ms>kt.ms?'1위':up.ms>skt?.ms?'2위':'3위'):'—'}
+
+위 6개 탭 데이터를 바탕으로 아래 JSON 형식으로만 응답해줘 (마크다운 코드블록 없이 순수 JSON만):
+{
+  "ov":{"현재상태":"2-3줄 종합 평가","특이사항":"주목할 점","원인파악":"점검 필요"},
+  "kpi":{"현재상태":"KPI 달성 평가","특이사항":"주목할 점","원인파악":"점검 필요"},
+  "sub":{"현재상태":"구독형 평가","특이사항":"주목할 점","원인파악":"점검 필요"},
+  "bld":{"현재상태":"구축형 평가","특이사항":"주목할 점","원인파악":"점검 필요"},
+  "ch":{"현재상태":"채널 평가","특이사항":"주목할 점","원인파악":"점검 필요"},
+  "comp":{"현재상태":"경쟁 평가","특이사항":"주목할 점","원인파악":"점검 필요"}
+}`;
+}
+
+function formatAiText(text){
+  return (text||'')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^\* (.+)$/gm,'<div style="padding-left:12px;">• $1</div>')
+    .replace(/^- (.+)$/gm,'<div style="padding-left:12px;">• $1</div>')
+    .replace(/\n/g,'<br>');
+}
+
+function renderInsightCards(parsed,ts){
+  const timeStr=ts?`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">📊 인사이트 분석 결과 · ${ts} 기준</div>`:'';
+  const cards=[
+    {icon:'📊',title:'현재 상태',color:'#3D3D8F',text:parsed['현재상태']},
+    {icon:'⚠️',title:'특이사항',color:'#FF9800',text:parsed['특이사항']},
+    {icon:'🔴',title:'원인 파악',color:'#F44336',text:parsed['원인파악']}
+  ];
+  return `${timeStr}<div class="ai-insight-grid">${cards.map(c=>`
+    <div class="ai-card">
+      <div class="ai-card-bar" style="background:${c.color};"></div>
+      <div style="flex:1;">
+        <div class="ai-card-title">${c.icon} ${c.title}</div>
+        <div class="ai-card-body">${formatAiText(c.text||'')}</div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function _formatMarketText(text,sources){
+  const src=sources||[];
+  const noInfo=/찾을 수 없습니다|확인되지 않습니다|없습니다|알 수 없습니다/;
+  // 번호 항목별 파싱
+  const items=[];
+  let cur=null;
+  text.split('\n').forEach(raw=>{
+    let line=raw.replace(/^#{1,4}\s*/,'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    if(/^\d+[\.\)]\s/.test(line)){
+      if(cur)items.push(cur);
+      const title=line.replace(/^\d+[\.\)]\s*/,'');
+      cur={title:line.match(/^\d+/)[0]+'. '+title,body:[],skip:false};
+    }else if(cur){
+      const clean=line.replace(/<[^>]+>/g,'').trim();
+      if(!clean)return;
+      if(noInfo.test(clean)){cur.skip=true;return;}
+      if(/^[\*\-•]\s/.test(line)){
+        cur.body.push(line.replace(/^[\*\-•]\s*/,''));
+      }else{
+        cur.body.push(line);
+      }
+    }
+  });
+  if(cur)items.push(cur);
+  // 필터링 + 렌더링
+  const visible=items.filter(it=>!it.skip&&(it.body.length>0||it.title));
+  return visible.map((it,i)=>{
+    const bodyHtml=it.body.length>0?`<ul class="market-item-body">${it.body.map(b=>`<li>${b}</li>`).join('')}</ul>`:'';
+    const s=i<src.length?`<div class="market-source">└ 📎 <a href="${src[i].url}" target="_blank" rel="noopener">${src[i].title}</a></div>`:'';
+    return `<div class="market-item"><div class="market-item-title">${it.title}</div>${bodyHtml}${s}</div>`;
+  }).join('')+(src.length>visible.length?`<div class="market-source" style="margin-top:4px;">📎 ${src.slice(visible.length).map(s=>`<a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>`).join(' ')}</div>`:'');
+}
+
+function renderMarketSection(m1,m2,ts){
+  const timeStr=ts?` · ${ts} 기준`:'';
+  function mkCard(icon,title,data){
+    return `<div class="ai-card">
+      <div class="ai-card-bar" style="background:#22C55E;"></div>
+      <div style="flex:1;">
+        <div class="ai-card-title">${icon} ${title}</div>
+        <div class="ai-card-body">${_formatMarketText(data.text||'',data.sources)}</div>
+      </div>
+    </div>`;
+  }
+  return `<div class="ai-market-section">
+    <div class="ai-market-title">🌐 시장 인사이트 · Google Search 기반 실시간 조사${timeStr}</div>
+    <div class="ai-market-grid">
+      ${mkCard('📡','경쟁사 수주 및 시장 동향',m1)}
+      ${mkCard('💬','도입 사례 및 고객 반응',m2)}
+    </div>
+  </div>`;
+}
+
+function _activeTab(){
+  return document.querySelector('.tb.on')?.getAttribute('onclick')?.match(/go\('(\w+)'/)?.[1]||'ov';
+}
+
+function _renderCachedInsight(tab){
+  const el=document.getElementById('ai-insight-'+tab);
+  if(!el)return;
+  const cached=_aiCache.results[tab];
+  if(cached){
+    el.className='';
+    el.innerHTML=renderInsightCards(cached,_aiCache.timestamp);
+  }
+  if(tab==='ov'){
+    const mEl=document.getElementById('ai-market-ov');
+    if(mEl&&_aiCache.market1&&_aiCache.market2){
+      mEl.className='';
+      mEl.innerHTML=renderMarketSection(_aiCache.market1,_aiCache.market2,_aiCache.timestamp);
+    }
+  }
+}
+
+function _setAiBtn(text){
+  const btn=document.getElementById('btn-ai');
+  if(btn)btn.textContent=text;
+}
+
+function _fetchGemini(body){
+  return fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${_AI_CONFIG.model}:generateContent?key=${_AI_CONFIG.apiKey}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}
+  ).then(res=>{
+    if(!res.ok)return res.text().then(err=>{throw new Error(res.status===401||res.status===403?'API 키가 유효하지 않습니다':res.status+' '+err);});
+    return res.json();
+  });
+}
+
+function _cleanMarketText(raw){
+  return raw
+    .replace(/^[^\n]*알겠습니다[^\n]*\n?/,'')
+    .replace(/^[^\n]*답변드리겠습니다[^\n]*\n?/,'')
+    .replace(/^다음은[^\n]*\n?/,'')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+}
+
+function _parseMarketResponse(data){
+  const cand=data?.candidates?.[0];
+  const rawText=cand?.content?.parts?.map(p=>p.text||'').join('')||'';
+  const text=_cleanMarketText(rawText);
+  const gm=cand?.groundingMetadata||cand?.grounding_metadata;
+  const chunks=gm?.groundingChunks||gm?.grounding_chunks||[];
+  const sources=chunks.filter(c=>c.web).map(c=>({title:c.web.title||'출처',url:c.web.uri||c.web.url||'#'}));
+  return {text,sources};
+}
+
+function runTabAi(){
+  if(!_AI_CONFIG.apiKey||_AI_CONFIG.apiKey==='YOUR_API_KEY_HERE'){
+    toast('⚠️','API 키를 설정해주세요','index.html에서 _AI_CONFIG.apiKey를 입력하세요.');
+    return;
+  }
+  // 캐시 초기화
+  _aiCache.timestamp=null;
+  _aiCache.results={ov:null,kpi:null,sub:null,bld:null,ch:null,comp:null};
+  _aiCache.market1=null;_aiCache.market2=null;
+  // 현재 탭 로딩 표시
+  const curTab=_activeTab();
+  const curEl=document.getElementById('ai-insight-'+curTab);
+  if(curEl){curEl.className='ai-placeholder';curEl.innerHTML='⏳ 전체 탭 분석 중...';}
+  const mEl=document.getElementById('ai-market-ov');
+  if(mEl){mEl.className='ai-placeholder';mEl.innerHTML='⏳ 시장 동향 조사 중...';}
+  _setAiBtn('⏳ 분석 중...');
+
+  const analysisReq=_fetchGemini({contents:[{parts:[{text:_buildAllPrompt()}]}]});
+  const market1Req=_fetchGemini({
+    contents:[{parts:[{text:'2025년~2026년 최신 정보만 사용해서 아래 순서대로 답변해줘.\n시점 불명확한 정보는 제외. 도입부 없이 바로 시작.\n\n1. 국내 AICC/컨택센터 수주 및 계약 사례\n- KT, SKT, 카카오엔터프라이즈 등 최신 계약 사례\n- 공공기관/대기업 AICC 도입 발표\n- 시점 반드시 포함 (없으면 해당 항목 제외)\n\n2. AICC 관련 AI 기술 최신 동향\n- 음성인식(STT), 음성합성(TTS), LLM 기반 상담 AI 신기술 발표\n- 주요 AI 테크사(구글, 마이크로소프트, 네이버, 카카오 등) 컨택센터 관련 신규 모델/서비스 출시\n- 시장 반응 및 도입 사례\n\n3. AICC 시장 주목할 움직임\n- M&A, 파트너십, 투자 유치 등 업계 이슈\n\n답변 규칙:\n- 각 항목: 굵은 제목 + 핵심 2줄 이내\n- 시점 반드시 포함\n- 정보 없는 항목은 생략\n- 전체 400자 이내'}]}],
+    tools:[{google_search:{}}]
+  });
+  const market2Req=_fetchGemini({
+    contents:[{parts:[{text:'다음 항목에 대해 2025년~2026년 실제 사례와 현장 반응 위주로 조사해줘:\n\n1. 기업들의 AICC 도입 후 실제 효과/ROI 사례\n2. AICC 도입 실패 또는 문제 발생 사례\n3. 고객사들의 AICC에 대한 불만/요구사항\n4. AI 상담원 거부감 등 실제 고객 반응\n\n답변 규칙:\n- 도입부/인사말 없이 바로 내용 시작\n- 각 항목: 제목 1줄 + 핵심 내용 1-2줄만\n- 사례에는 반드시 시점 명시 예: (2026.01), (2025년 하반기)\n- 시점 불명확한 정보는 제외\n- 불필요한 수식어, 부연설명 제거\n- 총 답변 200자 이내로 압축'}]}],
+    tools:[{google_search:{}}]
+  });
+
+  Promise.allSettled([analysisReq,market1Req,market2Req]).then(([anaRes,m1Res,m2Res])=>{
+    const now=new Date();
+    const ts=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    _aiCache.timestamp=ts;
+
+    // 실적 분석 처리
+    if(anaRes.status==='fulfilled'){
+      const raw=anaRes.value?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      const cleaned=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+      let parsed;
+      try{parsed=JSON.parse(cleaned);}catch(_){parsed=null;}
+      if(parsed){
+        ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{
+          if(parsed[t])_aiCache.results[t]=parsed[t];
+        });
+      }else{
+        _aiCache.results[curTab]={'현재상태':raw,'특이사항':'','원인파악':''};
+      }
+    }else{
+      _aiCache.results[curTab]={'현재상태':'실적 분석 실패: '+anaRes.reason?.message,'특이사항':'','원인파악':''};
+    }
+
+    // 시장 트렌드 처리
+    if(m1Res.status==='fulfilled'){
+      _aiCache.market1=_parseMarketResponse(m1Res.value);
+    }else{
+      _aiCache.market1={text:'시장 동향 조회 실패: '+m1Res.reason?.message,sources:[]};
+    }
+    if(m2Res.status==='fulfilled'){
+      _aiCache.market2=_parseMarketResponse(m2Res.value);
+    }else{
+      _aiCache.market2={text:'도입 사례 조회 실패: '+m2Res.reason?.message,sources:[]};
+    }
+
+    _renderCachedInsight(_activeTab());
+    _setAiBtn('📊 인사이트 분석 ✓');
+  });
+}
+
+/* ── Sheets 저장 ── */
+function saveToSheets(){
+  const status=document.getElementById('sheets-status');
+  const url=_SHEETS_CONFIG.url;
+  if(!url){if(status)status.textContent='❌ Sheets URL이 설정되지 않았습니다';return;}
+  if(status)status.textContent='⏳ 저장 중...';
+  const payload={
+    type:'save',
+    timestamp:new Date().toISOString(),
+    data:JSON.stringify(D),
+    insights:{
+      ov:_aiCache.results.ov||null,
+      kpi:_aiCache.results.kpi||null,
+      sub:_aiCache.results.sub||null,
+      bld:_aiCache.results.bld||null,
+      ch:_aiCache.results.ch||null,
+      comp:_aiCache.results.comp||null,
+      market1:_aiCache.market1||null,
+      market2:_aiCache.market2||null,
+      analysisTime:_aiCache.timestamp||null
+    }
+  };
+  fetch(url,{method:'POST',body:JSON.stringify(payload)})
+    .then(res=>{
+      if(!res.ok)throw new Error(res.status);
+      return res.text();
+    })
+    .then(()=>{
+      const now=new Date();
+      const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      if(status)status.textContent=`✅ 저장 완료 (${ts})`;
+    })
+    .catch(()=>{
+      if(status)status.textContent='❌ 저장 실패 — URL 확인 필요';
+    });
+}
 
 window.addEventListener('load',()=>{
   window._built={ov:true};
