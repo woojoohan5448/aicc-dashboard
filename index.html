@@ -34,6 +34,7 @@ if(sessionStorage.getItem('aicc_auth')!=='ok'){
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="libs/xlsx.full.min.js"></script>
 <script src="libs/chart.umd.min.js"></script>
+<script src="config.js"></script>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @font-face {
@@ -3585,7 +3586,7 @@ tr:hover td { background:var(--bg); }
 
 <script>
 const _AI_CONFIG = {
-  apiKey: 'AIzaSyAOjanwXLUVzLnq0pGszU8NQXRZ6Vak-tY',
+  apiKey: (window._LOCAL_CONFIG&&window._LOCAL_CONFIG.geminiKey)||'',
   model: 'gemini-2.0-flash'
 };
 
@@ -6809,6 +6810,11 @@ window.addEventListener('load',()=>{
   window._built={ov:true};
   setTimeout(()=>{
     try { buildOv(); } catch(e) { console.error('buildOv error:', e); }
+    // API 키 없으면 버튼 숨김
+    if(!_AI_CONFIG.apiKey){
+      const btn=document.getElementById('btn-ai');
+      if(btn)btn.style.display='none';
+    }
     // READ_ONLY 모드: 버튼 숨기고 캐시 데이터로 인사이트 표시
     if(window._READ_ONLY===true){
       const btn=document.getElementById('btn-ai');
