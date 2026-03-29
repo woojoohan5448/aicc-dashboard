@@ -3,6 +3,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>실적 현황 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="libs/xlsx.full.min.js"></script>
 <script src="libs/chart.umd.min.js"></script>
 <style>
@@ -329,6 +331,79 @@ tr:hover td { background:var(--bg); }
 .tip-wrap.tip-right .tip-box { left:0; transform:none; }
 .tip-wrap.tip-right .tip-box::before { left:20px; transform:none; }
 
+/* ── KPI 카드 섹션 ── */
+.kpi-section { padding: 24px 0; }
+.kpi-sec-label {
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:#8890B0;margin-bottom:18px;
+}
+.kpi-sec-label::after{content:'';flex:1;height:1px;background:#E4E6F0;}
+.kpi-grid-new{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:0;}
+.kpi-card-new{background:#fff;border-radius:16px;border:1px solid #E4E6F0;cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden;display:flex;flex-direction:column;}
+.kpi-card-new:hover{border-color:#B0B8D8;box-shadow:0 4px 20px rgba(26,31,78,.08);}
+.kpi-card-new.kpi-active{border-color:#2D2D6B;box-shadow:0 4px 24px rgba(45,45,107,.14);}
+.kpi-card-new .kn-head{background:#1A1F4E;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.kpi-card-new .kn-head h3{font-size:14px;font-weight:700;color:#fff;}
+.kn-grade-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;}
+.kn-gb-s{background:#10B981;} .kn-gb-a{background:#3B82F6;} .kn-gb-b{background:#6366F1;} .kn-gb-c{background:#F59E0B;} .kn-gb-d{background:#EF4444;}
+.kn-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;}
+.kn-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.kn-meta-item{display:flex;flex-direction:column;gap:2px;}
+.kn-meta-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8890B0;}
+.kn-meta-val{font-family:'DM Mono','LG Smart',monospace;font-size:28px;font-weight:500;color:#0F1123;line-height:1.2;}
+.kn-meta-unit{font-size:13px;color:#8890B0;margin-left:2px;}
+.kn-meta-sub{font-size:11px;color:#8890B0;margin-top:3px;}
+.kn-diff-plus{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:#3B82F6;line-height:1.2;}
+.kn-diff-minus{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:#EF4444;line-height:1.2;}
+.kn-diff-unit{font-size:13px;margin-left:1px;}
+.kn-status-row{margin-bottom:14px;}
+.kn-status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;}
+.kn-st-s{background:#D1FAE5;color:#065F46;} .kn-st-a{background:#DBEAFE;color:#1E40AF;} .kn-st-b{background:#EDE9FE;color:#4338CA;} .kn-st-c{background:#FEF3C7;color:#92400E;} .kn-st-d{background:#FEE2E2;color:#991B1B;}
+.kn-eval-label{opacity:.75;} .kn-eval-grade{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;}
+.kn-bar-wrap{background:#EEF0F8;border-radius:100px;height:5px;margin-bottom:14px;overflow:hidden;}
+.kn-bar-fill{height:100%;border-radius:100px;}
+.kn-bf-s{background:#10B981;} .kn-bf-a{background:#3B82F6;} .kn-bf-b{background:#6366F1;} .kn-bf-c{background:#F59E0B;} .kn-bf-d{background:#EF4444;}
+.kn-divider{height:1px;background:#E4E6F0;margin-bottom:12px;}
+.kn-pills{display:flex;flex-direction:column;gap:4px;}
+.kn-pill{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:#8890B0;}
+.kn-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.kn-dot-blue{background:#3B82F6;} .kn-dot-orange{background:#F59E0B;}
+.kn-pill strong{color:#0F1123;font-weight:500;}
+.kn-hint{display:flex;align-items:center;justify-content:center;padding:18px 0;}
+.kn-hint-inner{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #E4E6F0;border-radius:12px;padding:11px 22px;font-size:13px;font-weight:500;color:#2D2D6B;box-shadow:0 2px 8px rgba(45,45,107,.06);}
+.kn-hint-icon{width:20px;height:20px;border-radius:50%;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:12px;color:#4B4BAD;flex-shrink:0;}
+.kn-panel{background:#fff;border:1px solid #E4E6F0;border-radius:16px;overflow:hidden;margin-bottom:32px;animation:knSlideDown .3s ease;}
+.kn-panel.kn-hidden{display:none;}
+.kn-panel-inner{padding:24px 24px 28px;}
+.kn-panel-title{font-size:14px;font-weight:700;color:#1A1F4E;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.kn-panel-title::after{content:'';flex:1;height:1px;background:#E4E6F0;}
+.kn-panel-cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.kn-def-rows{display:flex;flex-direction:column;gap:12px;}
+.kn-def-item{display:flex;flex-direction:column;gap:3px;}
+.kn-def-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8890B0;}
+.kn-def-val{font-size:12px;color:#3A3F60;line-height:1.65;}
+.kn-def-val em{font-style:normal;background:#EEF2FF;color:#4B4BAD;padding:1px 5px;border-radius:4px;font-size:11px;}
+.kn-formula{background:#F5F7FF;border-left:3px solid #2D2D6B;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:4px;}
+.kn-formula-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8890B0;margin-bottom:4px;}
+.kn-formula-val{font-family:'DM Mono',monospace;font-size:12px;color:#2D2D6B;}
+.kn-grade-wrap h4{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8890B0;margin-bottom:10px;}
+.kn-grade-tbl{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12px;}
+.kn-grade-tbl th{padding:7px 10px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8890B0;border-bottom:1px solid #E4E6F0;}
+.kn-grade-tbl th.kn-gc{text-align:left;width:36px;}
+.kn-grade-tbl td{padding:8px 10px;text-align:center;border-bottom:1px solid #E4E6F0;color:#0F1123;}
+.kn-grade-tbl td.kn-gc{text-align:left;font-weight:500;color:#2D2D6B;}
+.kn-grade-tbl tr:last-child td{border-bottom:none;}
+.kn-grade-tbl tr.kn-cur td{background:#F5F7FF;} .kn-grade-tbl tr.kn-next td{background:#FFF7ED;}
+.kn-cur-mark{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:#1A1F4E;}
+.kn-cur-mark::before{content:'›';font-size:14px;color:#3B82F6;}
+.kn-next-mark{display:inline-flex;align-items:center;gap:4px;font-weight:500;color:#92400E;}
+.kn-next-mark::before{content:'↑';font-size:11px;color:#F59E0B;}
+.kn-legend{display:flex;gap:14px;margin-top:8px;}
+.kn-legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#8890B0;}
+.kn-legend-dot{width:8px;height:8px;border-radius:2px;}
+@keyframes knSlideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
 /* 반응형 */
 @media(max-width:1400px){
   .summary-block { gap:12px; }
@@ -347,6 +422,8 @@ tr:hover td { background:var(--bg); }
   .g2 { grid-template-columns:1fr; }
   .g3 { grid-template-columns:1fr; }
   .g4 { grid-template-columns:1fr 1fr; }
+  .kpi-grid-new { grid-template-columns:1fr; }
+  .kn-panel-cols { grid-template-columns:1fr; }
   .kgrid { grid-template-columns:repeat(2,1fr); }
   .top10-grid { grid-template-columns:1fr 1fr; }
   .summary-block { grid-template-columns:1fr; }
@@ -379,12 +456,15 @@ tr:hover td { background:var(--bg); }
 <!-- TABS -->
 <div class="tabs">
   <button class="tb on" onclick="go(&#39;ov&#39;,this)">종합 현황</button>
+  <button class="tb" onclick="go(&#39;kpi&#39;,this)">KPI 현황</button>
   <button class="tb" onclick="go(&#39;sub&#39;,this)">구독형</button>
   <button class="tb" onclick="go(&#39;bld&#39;,this)">구축형</button>
   <button class="tb" onclick="go(&#39;ch&#39;,this)">채널 현황</button>
   <button class="tb" onclick="go(&#39;comp&#39;,this)">경쟁현황</button>
   <button class="tb tb-edit" onclick="go(&#39;edit&#39;,this)">✏️ 데이터 입력</button>
 </div>
+
+<div class="page" id="p-kpi"></div>
 
 <div class="page on" id="p-ov">
   <div class="summary-block" id="sb-ov">
@@ -3458,6 +3538,49 @@ tr:hover td { background:var(--bg); }
 <script>
 let SEED = {"summary": {"annual": {"labels": ["2022", "2023", "2024", "2025", "2026(~3월)", "누적"], "market": [1020, 1250, 1440, 1650, 367, 5727], "revenue": [50, 277, 178, 251, null, 756], "sub_rev": [null, 12, 37, 93, 18, 160], "bld_rev": [50, 265, 141, 136, 6, 597], "ms": [5, 22, 12, 14, 6, 13], "profit": [-22, -18, -32, -23, -16, -101], "profit_r": [-44.4, -6.6, -18, -9.1, null, -12.6]}, "kpi": {"total_rev": 757, "profit": -101, "ms": 13, "sub_lines": 4624, "sub_clients": 480, "bld_order": 1005, "bld_count": 34, "bld_clients": 34, "base_period": "2026.02 (25년 누적)", "bld_rev_cum": 597, "tag_ms": "", "tag_sub_rev": "", "tag_sub_lines": "", "tag_sub_clients": "", "tag_bld_order": "", "tag_bld_clients": ""}, "note25": {"label": "25년 마감기준", "text": "구독 93억 · 구축 136억 · 합계 229억 · M/S 14%"}}, "subscription": {"products": [{"name": "콜인프라", "lines": 3484, "clients": 446, "avg_lines": 8.97938144329897, "arpu": 4.3, "period": 36, "note": "주력 상품"}, {"name": "AI콜봇", "lines": 449, "clients": 31, "avg_lines": 18.4545454545455, "arpu": 13, "period": 36, "note": "LG전자 전략 수주(ARPU 낮음)"}, {"name": "AI상담지원", "lines": 465, "clients": 57, "avg_lines": 8.29545454545455, "arpu": 4.6, "period": 36, "note": null}, {"name": "AI대화록", "lines": 249, "clients": 16, "avg_lines": 17.3571428571429, "arpu": 0.9, "period": 36, "note": null}], "products_total": {"lines": 4498, "clients": 468}, "monthly": {"labels": ["25.01", "25.02", "25.03", "25.04", "25.05", "25.06", "25.07", "25.08", "25.09", "25.10", "25.11", "25.12", "26.01", "26.02"], "data": {"콜인프라": [76, 85, 122, 118, 114, 109, 88, 489, 71, 228, 151, 103, 86, 67], "AI콜봇": [254, 5, 20, 3, 3, 1, 9, 9, 2, 14, 0, 0, 6, 12], "AI상담지원": [0, 5, 11, 4, 13, 41, 21, 21, 8, 2, 26, 34, 2, 7], "AI대화록": [0, 30, 3, 7, 3, 2, 100, 0, 0, 1, 0, 3, 0, 2], "합계": [330, 125, 156, 132, 133, 153, 218, 519, 81, 245, 177, 140, 94, 88]}}, "industry": [{"name": "제조", "lines": 1208}, {"name": "정보/IT/통신", "lines": 1173}, {"name": "서비스", "lines": 930}, {"name": "유통", "lines": 723}, {"name": "의료", "lines": 142}, {"name": "공공/협회/복지", "lines": 101}, {"name": "교육", "lines": 73}, {"name": "금융/보험", "lines": 67}, {"name": "방송/미디어", "lines": 67}, {"name": "여행/숙박", "lines": 57}, {"name": "건설/부동산/임대", "lines": 30}, {"name": "물류/운수", "lines": 24}, {"name": "요식업", "lines": 15}, {"name": "개인사업자", "lines": 14}, {"name": "환경/에너지/시설", "lines": 10}, {"name": "법률/회계", "lines": 6}, {"name": "법률/세무", "lines": 5}, {"name": "통신업", "lines": 4}]}, "buildup": {"pipeline": {"label": "2026(~3월)", "order": 120, "count": 8}, "annual": {"labels": ["2021", "2022", "2023", "2024", "2025", "2026", "누적"], "order": [18, 271, 265, 189, 266, 14, 1026], "revenue": [null, 50, 264, 141, 136, 6, 597], "count": [1, 4, 5, 12, 11, 2, 34]}, "industry": [{"name": "금융", "count": 23, "amount": 749}, {"name": "제조", "count": 3, "amount": 23}, {"name": "서비스", "count": 4, "amount": 54}, {"name": "유통", "count": 1, "amount": 31}, {"name": "교육", "count": 1, "amount": 3}], "contracts": [{"year": 2021, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "상담품질", "amount": 18, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리카드", "content": "콜봇", "amount": 36, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB금융그룹(8개)", "content": "FCC", "amount": 212, "note": "★최대"}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협은행", "content": "상담품질", "amount": 5, "note": null}, {"year": 2022, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB카드", "content": "FCC대응개발", "amount": 18, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한은행", "content": "AICC인프라/STT/TA", "amount": 226, "note": "★최대"}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "생명보험사", "content": "FCC대응개발", "amount": 8, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB손해보험", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2023, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC인프라/AI콜봇", "amount": 19, "note": null}, {"year": 2023, "group": "기업고객", "sector": "금융", "sub": "", "client": "동양생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "하나증권", "content": "AICC인프라/STT/sLLM", "amount": 27, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "유비케어", "content": "STT/KMS", "amount": 7, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB라이프생명", "content": "FCC대응개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AICC연동개발", "amount": 3, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저", "amount": 21, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "모두투어", "content": "AICC인프라/STT", "amount": 9, "note": null}, {"year": 2024, "group": "기업고객", "sector": "서비스", "sub": "", "client": "피앤피시큐어", "content": "AICC인프라", "amount": 16, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "KB국민은행 등", "content": "챗봇", "amount": 17, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "한화생명", "content": "AI상품봇", "amount": 36, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "신한카드", "content": "상담어드바이저추가개발", "amount": 1, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "산은캐피탈", "content": "AICC인프라", "amount": 40, "note": null}, {"year": 2024, "group": "기업고객", "sector": "금융", "sub": "", "client": "NH농협생명", "content": "AICC인프라/STT", "amount": 10, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "챗봇", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "마이브라운", "content": "AICC인프라", "amount": 4, "note": null}, {"year": 2025, "group": "기업고객", "sector": "서비스", "sub": "", "client": "에스원", "content": "AICC인프라/STT", "amount": 23, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "AICC인프라/STT", "amount": 13, "note": null}, {"year": 2025, "group": "기업고객", "sector": "유통", "sub": "", "client": "쿠팡", "content": "AICC인프라/STT", "amount": 31, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "우리투자증권", "content": "AICC인프라/STT/TA/KMS", "amount": 20, "note": null}, {"year": 2025, "group": "기업고객", "sector": "교육", "sub": "", "client": "크레버스", "content": "AICC인프라/STT", "amount": 3, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "SBI저축은행", "content": "AICC인프라/STT", "amount": 17, "note": null}, {"year": 2025, "group": "기업고객", "sector": "금융", "sub": "", "client": "메리츠증권", "content": "KMS", "amount": 2, "note": null}, {"year": 2025, "group": "기업고객", "sector": "제조", "sub": "", "client": "쿠쿠전자", "content": "AICC연동개발", "amount": 1, "note": null}]}, "channel": {"annual": {"labels": ["~24년", "25년", "26년(1~3월)", "누적"], "direct": [500, 590, 1321, 2492], "indirect": [33, 910, 1088, 2187]}, "by_product": [{"product": "콜인프라", "channel": "직접", "y24_lines": 500, "y24_pct": 1, "y25_lines": 212, "y25_pct": 0.2, "y26_lines": 903, "y26_pct": 0.51, "total_lines": 1665, "total_pct": 0.48}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 842, "y25_pct": 0.8, "y26_lines": 851, "y26_pct": 0.49, "total_lines": 1819, "total_pct": 0.52}, {"product": "AI대화록", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 87, "y25_pct": 0.91, "y26_lines": 42, "y26_pct": 0.28, "total_lines": 131, "total_pct": 0.52}, {"product": "", "channel": "간접", "y24_lines": 2, "y24_pct": 1, "y25_lines": 9, "y25_pct": 0.09, "y26_lines": 107, "y26_pct": 0.72, "total_lines": 119, "total_pct": 0.48}, {"product": "AI상담지원", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 183, "y25_pct": 0.77, "y26_lines": 71, "y26_pct": 0.38, "total_lines": 260, "total_pct": 0.56}, {"product": "", "channel": "간접", "y24_lines": 31, "y24_pct": 1, "y25_lines": 56, "y25_pct": 0.23, "y26_lines": 115, "y26_pct": 0.62, "total_lines": 205, "total_pct": 0.44}, {"product": "AI콜봇", "channel": "직접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 108, "y25_pct": 0.97, "y26_lines": 305, "y26_pct": 0.95, "total_lines": 425, "total_pct": 0.94}, {"product": "", "channel": "간접", "y24_lines": 0, "y24_pct": 0, "y25_lines": 3, "y25_pct": 0.15, "y26_lines": 15, "y26_pct": 0.05, "total_lines": 25, "total_pct": 0.06}, {"product": "계", "channel": "직접", "y24_lines": 500, "y24_pct": 0.94, "y25_lines": 590, "y25_pct": 0.39, "y26_lines": 1321, "y26_pct": 0.55, "total_lines": 2481, "total_pct": 0.53}, {"product": "", "channel": "간접", "y24_lines": 33, "y24_pct": 0.06, "y25_lines": 910, "y25_pct": 0.61, "y26_lines": 1088, "y26_pct": 0.45, "total_lines": 2168, "total_pct": 0.47}], "dealers": [{"region": "강남", "no": 1, "name": "엑티브아이티(주)", "product": "AI대화록+콜인프라", "y25_cum": 57, "m2601": 2, "m2602": 2, "m2603": 0, "y26_sum": 4}, {"region": "강남", "no": 2, "name": "주식회사디컴스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 20, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 3, "name": "(주)미디네트웍스", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 4, "name": "(주)세인엔에스", "product": "AI상담지원+콜인프라", "y25_cum": 43, "m2601": 5, "m2602": 0, "m2603": 0, "y26_sum": 5}, {"region": "강남", "no": 5, "name": "(주)아이에스넷", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 6, "name": "(주)엠트리네트웍스", "product": "콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 7, "name": "(주)예원네트웍스", "product": "AI대화록+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 8, "name": "(주)유클라우드", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 9, "name": "(주)주연전자서비스", "product": "AI콜봇+콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 10, "name": "(주)지디네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 8, "m2602": 0, "m2603": 0, "y26_sum": 8}, {"region": "강남", "no": 11, "name": "(주)현승솔루션", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 12, "name": "스피드통신시스템", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 13, "name": "오케이엔이티", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 14, "name": "주식회사 드레니", "product": "AI상담지원+콜인프라", "y25_cum": 68, "m2601": 0, "m2602": 1, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 15, "name": "주식회사 이알에프", "product": "콜인프라", "y25_cum": 12, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "강남", "no": 16, "name": "주식회사 탑컴", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강남", "no": 17, "name": "주식회사 텔컴스", "product": "AI콜봇+콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 18, "name": "(주)엑스파워네트웍스", "product": "콜인프라", "y25_cum": 31, "m2601": 0, "m2602": 19, "m2603": 0, "y26_sum": 19}, {"region": "강북", "no": 19, "name": "(주)텔몬", "product": "AI상담지원+콜인프라", "y25_cum": 147, "m2601": 22, "m2602": 25, "m2603": 5, "y26_sum": 52}, {"region": "강북", "no": 20, "name": "정현에프엠씨", "product": "AI대화록+AI상담지원+AI콜봇+콜인프라", "y25_cum": 179, "m2601": 10, "m2602": 3, "m2603": 1, "y26_sum": 14}, {"region": "강북", "no": 21, "name": "주식회사 비플", "product": "AI대화록+AI상담지원+콜인프라", "y25_cum": 170, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 22, "name": "주식회사 티넷텔레콤", "product": "AI상담지원+콜인프라", "y25_cum": 33, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 23, "name": "씨앤엔", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 24, "name": "(주)베가네트웍스", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 25, "name": "(주)이룸솔루션", "product": "AI상담지원+콜인프라", "y25_cum": 0, "m2601": 2, "m2602": 0, "m2603": 0, "y26_sum": 2}, {"region": "강북", "no": 26, "name": "(주)지앤아이테크", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 27, "name": "메트로넷", "product": "콜인프라", "y25_cum": 15, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 28, "name": "에스티", "product": "AI콜봇+콜인프라", "y25_cum": 12, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 29, "name": "예스라인정보통신", "product": "콜인프라", "y25_cum": 4, "m2601": 0, "m2602": 0, "m2603": 8, "y26_sum": 8}, {"region": "강북", "no": 30, "name": "위고위드", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 31, "name": "주식회사 비앤애프", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "강북", "no": 32, "name": "케이엘네트웍스", "product": "AI콜봇+콜인프라", "y25_cum": 39, "m2601": 0, "m2602": 0, "m2603": 13, "y26_sum": 13}, {"region": "강북", "no": 33, "name": "파워비스", "product": "AI대화록+콜인프라", "y25_cum": 71, "m2601": 0, "m2602": 0, "m2603": 1, "y26_sum": 1}, {"region": "솔루션", "no": 34, "name": "(주)브이원정보통신", "product": "AI콜봇+콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 35, "name": "(주)온파워네트웍스", "product": "AI상담지원+AI콜봇+콜인프라", "y25_cum": 35, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 36, "name": "(주)플러스비즈", "product": "콜인프라", "y25_cum": 8, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "솔루션", "no": 37, "name": "주식회사 아이티윈드", "product": "콜인프라", "y25_cum": 11, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 38, "name": "다원IT", "product": "콜인프라", "y25_cum": 0, "m2601": 3, "m2602": 0, "m2603": 0, "y26_sum": 3}, {"region": "동부", "no": 39, "name": "(주)아진정보통신", "product": "콜인프라", "y25_cum": 9, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 40, "name": "스피드정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "동부", "no": 41, "name": "이지네트워크", "product": "콜인프라", "y25_cum": 3, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 42, "name": "(주)닮커뮤니케이션", "product": "콜인프라", "y25_cum": 5, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 43, "name": "(주)쓰리에스정보통신", "product": "콜인프라", "y25_cum": 2, "m2601": 1, "m2602": 0, "m2603": 0, "y26_sum": 1}, {"region": "서부", "no": 44, "name": "비즈프로", "product": "콜인프라", "y25_cum": 1, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}, {"region": "서부", "no": 45, "name": "제이엠네트웍스", "product": "AI상담지원+콜인프라", "y25_cum": 28, "m2601": 0, "m2602": 0, "m2603": 0, "y26_sum": 0}], "dealer_headers": {"m01": "26.01", "m02": "26.02", "m03": "26.03"}}, "competitor": {"labels": ["2024", "2025", "2026 (예상)", "-", "-"], "data": {"LG U+": {"annual": [178, 229, 352, 0, 0], "total": 759, "ms": 0.29683222526398123}, "KT": {"annual": [275, 423, 718, 0, 0], "total": 1416, "ms": 0.5537739538521705}, "SKT": {"annual": [98, 113, 171, 0, 0], "total": 382, "ms": 0.14939382088384826}, "합계": {"annual": [551, 765, 1241, 0, 0], "total": 2557}}, "kt_notes": [{"client": "하나은행/카드", "year": 2021, "amount": 150, "note": null}, {"client": "신한금융지주", "year": 2021, "amount": 200, "note": null}, {"client": "한국교직원공제회", "year": 2024, "amount": 120, "note": null}, {"client": "NH농협은행", "year": 2025, "amount": 350, "note": "25년 최대"}]}, "top10": {"AI콜봇": [{"name": "LG전자", "lines": 251}, {"name": "(주)안랩", "lines": 66}, {"name": "(주)경동나비엔", "lines": 33}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 5}, {"name": "(주)아크도", "lines": 3}, {"name": "엠지신용정보(주)", "lines": 3}, {"name": "(주)모빌리티시스템스", "lines": 2}, {"name": "(주)미디어로그", "lines": 2}, {"name": "(주)주연테크", "lines": 2}], "AI상담지원": [{"name": "(주)티오더", "lines": 98}, {"name": "(주)코스모안컴퍼니", "lines": 26}, {"name": "비앤빛 강남밝은세상안과", "lines": 25}, {"name": "(재)경기도여성가족재단", "lines": 20}, {"name": "대성셀틱에너시스(주)", "lines": 20}, {"name": "(주)삼양인터내셔날", "lines": 15}, {"name": "주식회사 미트박스글로벌", "lines": 13}, {"name": "(주)가비아씨앤에스", "lines": 10}, {"name": "에스케이이스피드메이트", "lines": 10}, {"name": "주식회사 비플", "lines": 10}], "AI대화록": [{"name": "주식회사 비플", "lines": 100}, {"name": "(주)티오더", "lines": 83}, {"name": "프레시원주식회사", "lines": 30}, {"name": "(주)아워홈", "lines": 4}, {"name": "주식회사 하이클린", "lines": 4}, {"name": "(사단)개인정보보호협회", "lines": 4}, {"name": "닥터마틴에어웨어코리아", "lines": 3}, {"name": "둔산속편한내과영상의학과", "lines": 3}, {"name": "정현에프엠씨(주)", "lines": 3}, {"name": "(주)세인엔에스", "lines": 2}], "콜인프라": [{"name": "주식회사 비플", "lines": 170}, {"name": "정현에프엠씨", "lines": 148}, {"name": "(주)텔몬", "lines": 147}, {"name": "파워비스", "lines": 71}, {"name": "주식회사 드레니", "lines": 68}, {"name": "케이엘네트웍스", "lines": 39}, {"name": "(주)엑스파워네트웍스", "lines": 31}, {"name": "(주)지디네트웍스", "lines": 31}, {"name": "(주)지앤아이테크", "lines": 8}, {"name": "스피드통신시스템", "lines": 8}]}};
 let D = JSON.parse(JSON.stringify(SEED));
+
+/* ── KPI Mock 데이터 ── */
+SEED.kpi = {
+  year: 2026,
+  currentMonth: 2,
+  items: [
+    {
+      id: "AICC_RRMS", name: "AICC RRMS", unit: "%", type: "absolute",
+      target: 0.60, current: 0.62, base: 0.56,
+      grades: [
+        { grade: "S", min: 0.63 },
+        { grade: "A", min: 0.62 },
+        { grade: "B", min: 0.60 },
+        { grade: "C", min: 0.56 },
+        { grade: "D", min: 0 }
+      ]
+    },
+    {
+      id: "AICC_KA_REF", name: "KA 수주 레퍼런스", unit: "건", type: "count",
+      target: 5, current: 6,
+      grades: [
+        { grade: "S", min: 7 },
+        { grade: "A", min: 6 },
+        { grade: "B", min: 5 },
+        { grade: "C", min: 4 },
+        { grade: "D", min: 0 }
+      ]
+    },
+    {
+      id: "AICC_BUILD_ORDER", name: "구축형 수주액", unit: "억", type: "achievement",
+      target: 238, current: 330,
+      grades: [
+        { grade: "S", min: 1.20 },
+        { grade: "A", min: 1.10 },
+        { grade: "B", min: 1.00 },
+        { grade: "C", min: 0.90 },
+        { grade: "D", min: 0 }
+      ]
+    }
+  ]
+};
+D.kpi = JSON.parse(JSON.stringify(SEED.kpi));
+
 function toast(icon,msg,sub){
   document.getElementById('t-icon').textContent=icon;
   document.getElementById('t-msg').textContent=msg;
@@ -3501,7 +3624,7 @@ function rebuildAll(){
   const name=document.querySelector('.tb.on')?.getAttribute('onclick')?.match(/go\('(\w+)'/)?.[1]||'ov';
   buildPage(name);
 }
-function buildPage(n){({ov:buildOv,sub:buildSub,bld:buildBld,ch:buildCh,comp:buildComp,edit:buildEdit})[n]?.();}
+function buildPage(n){({ov:buildOv,kpi:buildKpi,sub:buildSub,bld:buildBld,ch:buildCh,comp:buildComp,edit:buildEdit})[n]?.();}
 
 /* ── KPI 카드 (다른 탭) ── */
 function kpiCards(id,cards){
@@ -3650,7 +3773,77 @@ function buildOv(){
 
   <div class="stitle">🏆 AICC상품별 Top10 고객사 및 대리점채널 Top10 <span class="sub">('22~'25) 회선수 기준</span></div>
   <div class="top10-grid" id="top10-grid"></div>
+
+  <div style="margin-top:24px;">
+    <div class="stitle">🎯 KPI 달성 현황 <span class="sub">목표 대비 현재 달성률</span></div>
+    <div class="g3">
+      ${(D.kpi&&D.kpi.items||[]).length>0 ? D.kpi.items.map((item,idx)=>{
+        const ratio=item.target>0?item.current/item.target:0;
+        const pct=(ratio*100).toFixed(0);
+        const cIds=['gauge-rrms','gauge-ka','gauge-bld'];
+        const units={'%':'%','건':'건','억':'억'};
+        const valDisplay=item.unit==='%'?item.current.toFixed(2):item.unit==='억'?fmt(item.current):String(item.current);
+        const tgtDisplay=item.unit==='%'?item.target.toFixed(2)+'%':item.unit==='억'?fmt(item.target)+'억':item.target+item.unit;
+        return `<div class="box" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+          <div style="font-size:12px;color:var(--dim);font-weight:700;margin-bottom:12px;width:100%;text-align:left;">${item.name}</div>
+          <canvas id="${cIds[idx]}" width="240" height="240" style="width:120px;height:120px;margin:0 auto 12px;"></canvas>
+          <div style="font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text);">${valDisplay}<span style="font-size:15px;font-weight:400;color:var(--dim);margin-left:2px;">${item.unit}</span></div>
+          <div style="display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--dim);margin-top:8px;">목표 ${tgtDisplay}</div>
+        </div>`;
+      }).join('') : `<div class="box" style="grid-column:1/-1;text-align:center;padding:40px 20px;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;">KPI 데이터가 없습니다</div>
+        <div style="font-size:12px;color:var(--dim);">수정 탭에서 KPI 데이터를 입력하세요</div>
+      </div>`}
+    </div>
+  </div>
   `;
+
+  /* ── KPI 달성 게이지 ── */
+  function drawGauge(canvasId, ratio, color){
+    const cvs=document.getElementById(canvasId);
+    if(!cvs)return;
+    const ctx=cvs.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    cvs.width=120*dpr;
+    cvs.height=120*dpr;
+    ctx.scale(dpr,dpr);
+    const cx=60,cy=70,r=48,lw=10;
+    const clampedRatio=Math.min(Math.max(ratio,0),1.5);
+    const fillAngle=Math.PI+(clampedRatio*Math.PI);
+    // track
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,Math.PI,0,false);
+    ctx.lineWidth=lw;
+    ctx.lineCap='round';
+    ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border').trim()||'#e2e5ea';
+    ctx.stroke();
+    // filled arc
+    if(ratio>0){
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,Math.PI,Math.min(fillAngle,2*Math.PI),false);
+      ctx.lineWidth=lw;
+      ctx.lineCap='round';
+      ctx.strokeStyle=color;
+      ctx.stroke();
+    }
+    // center text
+    const pct=(ratio*100).toFixed(0)+'%';
+    ctx.font="bold 15px 'DM Mono',monospace";
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#111827';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(pct,cx,cy-4);
+  }
+
+  // Render KPI gauges
+  if(D.kpi&&D.kpi.items&&D.kpi.items.length>0){
+    const accentColor=getComputedStyle(document.documentElement).getPropertyValue('--pink').trim()||'#2D2D6B';
+    const gaugeIds=['gauge-rrms','gauge-ka','gauge-bld'];
+    D.kpi.items.forEach((item,i)=>{
+      const ratio=item.target>0?item.current/item.target:0;
+      drawGauge(gaugeIds[i],ratio,accentColor);
+    });
+  }
 
   buildSummaryBlock('sb-ov', kpi, an);
 
@@ -5015,6 +5208,310 @@ function buildComp(){
 }
 
 /* ══════════════════════════════════════
+   KPI 현황
+══════════════════════════════════════ */
+function kpiGrade(item){
+  const g=item.grades||[];
+  let val;
+  if(item.type==='achievement') val=item.current/item.target;
+  else val=item.current;
+  for(let i=0;i<g.length;i++){if(val>=g[i].min)return g[i].grade;}
+  return 'D';
+}
+function kpiAchRate(item){
+  if(item.type==='achievement') return item.current/item.target;
+  if(item.type==='count') return item.current/item.target;
+  if(item.type==='absolute') return item.current/item.target;
+  return 0;
+}
+function kpiFmtVal(item){
+  if(item.type==='absolute') return item.current.toFixed(2);
+  return item.current;
+}
+function kpiFmtTarget(item){
+  if(item.type==='absolute') return item.target.toFixed(2);
+  return item.target;
+}
+
+/* KPI 카드 토글 */
+let knActive=0;
+function knToggle(idx){
+  const panels=[0,1,2].map(i=>document.getElementById('kn-panel-'+i));
+  const cards=[0,1,2].map(i=>document.getElementById('kn-card-'+i));
+  if(!panels[0])return;
+  if(knActive===idx){
+    panels[idx].classList.add('kn-hidden');
+    cards[idx].classList.remove('kpi-active');
+    knActive=-1;
+    return;
+  }
+  panels.forEach((p,i)=>{if(p)p.classList.add('kn-hidden');if(cards[i])cards[i].classList.remove('kpi-active');});
+  if(cards[idx])cards[idx].classList.add('kpi-active');
+  if(panels[idx]){
+    panels[idx].classList.remove('kn-hidden');
+    const hint=document.querySelector('.kn-hint');
+    if(hint)hint.insertAdjacentElement('afterend',panels[idx]);
+    setTimeout(()=>panels[idx].scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  }
+  knActive=idx;
+}
+
+/* 상세 패널 정의 데이터 */
+const KN_DEFS=[
+  {title:'AICC RRMS',
+   rows:[
+     ['정의','AICC 사업의 반복매출(Recurring Revenue) 기준 상대적 시장점유율'],
+     ['선정 배경','SaaS/구독형 전환 과정에서 지속 가능한 매출 경쟁력 측정. 경쟁사 대비 반복매출 경쟁우위 정량적 비교'],
+     ['측정 기준','기기 기본료 + S/W 라이선스 + 회선·통화료 등 월 단위 반복 발생 매출 / 외부 조사(KRG 등) 경쟁사 데이터 활용'],
+     ['평가 방식','절대값 구간 기준 — <em>달성률이 아닌 RRMS 수치 자체로 등급 판정</em>']
+   ],
+   formula:'자사 AICC Recurring 매출 ÷ 경쟁사 AICC Recurring 매출',
+   grades:[['S','≥ 0.63'],['A','≥ 0.62'],['B','≥ 0.60'],['C','≥ 0.56'],['D','< 0.56']]
+  },
+  {title:'KA 수주 레퍼런스',
+   rows:[
+     ['정의','Key Account(KA) 고객 대상 AICC 사업 수주 프로젝트 건수'],
+     ['선정 배경','도메인별 대표 고객 레퍼런스 확보가 핵심. KA 고객의 신뢰도와 동일 도메인 확산 효과(BP 사례 전파)를 중점 관리'],
+     ['측정 기준','프로젝트 기준 / 동일 KA 내 복수 프로젝트 각각 1건 인정 / 계약서 또는 공식 발주서·확약 문서 수령 시점'],
+     ['평가 방식','<em>절대 건수 구간 기준 평가</em>']
+   ],
+   formula:'KA 고객 대상 AICC 사업 수주 프로젝트 수 (연간 누적)',
+   grades:[['S','≥ 7건'],['A','≥ 6건'],['B','≥ 5건'],['C','≥ 4건'],['D','< 4건']]
+  },
+  {title:'구축형 수주액',
+   rows:[
+     ['정의','AICC 구축형(프로젝트형) 사업의 연간 수주 금액 누적 합계'],
+     ['선정 배경','SaaS 전환 전·중 단계에서 매출 및 레퍼런스 확보의 핵심 수단. 초기 매출 확보 후 장기 구독 확장 사업으로 연계'],
+     ['측정 기준','계약서 또는 공식 발주서 기준 / 구축형 사업(일회성 구축 + 유지보수 포함)'],
+     ['평가 방식','달성률 기준 — <em>실적 ÷ 목표 × 100 → 등급 판정</em> / 2단계 계산 구조']
+   ],
+   formula:'연간 AICC 구축형 사업 수주 금액 합계 (연간 누적)',
+   grades:[['S','≥ 120%'],['A','≥ 110%'],['B','≥ 100%'],['C','≥ 90%'],['D','< 90%']]
+  }
+];
+
+function buildKpiCards(){
+  const kd=D.kpi;
+  const grid=document.getElementById('kn-grid');
+  const panelWrap=document.getElementById('kn-panels');
+  if(!grid||!panelWrap||!kd||!kd.items)return;
+  const cm=kd.currentMonth||2;
+  const remaining=12-cm;
+  const gcMap={S:'s',A:'a',B:'b',C:'c',D:'d'};
+
+  let cardsH='',panelsH='';
+  kd.items.forEach((item,idx)=>{
+    const grade=kpiGrade(item);
+    const gc=gcMap[grade]||'d';
+    const curDisp=kpiFmtVal(item);
+    const tgtDisp=kpiFmtTarget(item);
+
+    /* ── 달성률 & 바 ── */
+    const achRate=kpiAchRate(item);
+    const achPct=(achRate*100).toFixed(1);
+    const barPct=Math.min(achRate*100,100);
+
+    /* ── 현재 등급 인덱스 & 한 단계 위 등급 ── */
+    const gi=item.grades.findIndex(g=>g.grade===grade);
+    const nextG=gi>0?item.grades[gi-1]:null; // 한 등급 위
+
+    /* ── 진척 현황 (diff) 계산 ── */
+    let diffVal='',diffClass='',diffSub='',diffUnit='';
+
+    if(item.type==='absolute'){
+      /* RRMS: 절대값 비교, 원본 비율 그대로 표시 */
+      if(!nextG){
+        const surplus=item.current-item.grades[0].min;
+        diffVal='+'+surplus.toFixed(2);
+        diffClass='kn-diff-plus';
+        diffSub='S등급 기준('+item.grades[0].min+') 초과';
+      }else{
+        const gap=nextG.min-item.current;
+        if(gap<=0){
+          diffVal='+'+(item.current-nextG.min).toFixed(2);
+          diffClass='kn-diff-plus';
+          diffSub=nextG.grade+'등급 기준('+nextG.min+') 충족';
+        }else{
+          diffVal='−'+gap.toFixed(2);
+          diffClass='kn-diff-minus';
+          diffSub=nextG.grade+'등급까지 '+gap.toFixed(2)+' 부족';
+        }
+      }
+    }else if(item.type==='count'){
+      /* KA 레퍼런스: 절대 건수 비교 */
+      diffUnit='<span class="kn-diff-unit" style="color:#8890B0">건</span>';
+      if(!nextG){
+        const surplus=item.current-item.grades[0].min;
+        diffVal='+'+surplus;
+        diffClass='kn-diff-plus';
+        diffSub='S등급 기준('+item.grades[0].min+'건) 초과';
+      }else{
+        const gap=nextG.min-item.current;
+        if(gap<=0){
+          diffVal='+'+(item.current-nextG.min);
+          diffClass='kn-diff-plus';
+          diffSub=nextG.grade+'등급 기준('+nextG.min+'건) 충족';
+        }else{
+          diffVal='−'+gap;
+          diffClass='kn-diff-minus';
+          diffSub=nextG.grade+'등급까지 '+gap+'건 부족';
+        }
+      }
+    }else{
+      /* 구축형 수주액: 달성률(current/target) vs grades[].min 비교 */
+      const rate=item.current/item.target; // 달성률 (예: 1.10)
+      diffUnit='<span class="kn-diff-unit" style="color:#8890B0">억</span>';
+      if(!nextG){
+        const surplusAmt=Math.round(item.current-item.target*item.grades[0].min);
+        diffVal='+'+surplusAmt;
+        diffClass='kn-diff-plus';
+        diffSub='S등급 기준(달성률 '+(item.grades[0].min*100).toFixed(0)+'%) 초과';
+      }else{
+        const needAmt=Math.round(item.target*nextG.min-item.current); // 다음 등급까지 필요 금액
+        if(needAmt<=0){
+          diffVal='+'+Math.abs(needAmt);
+          diffClass='kn-diff-plus';
+          diffSub=nextG.grade+'등급 기준(달성률 '+(nextG.min*100).toFixed(0)+'%) 충족';
+        }else{
+          diffVal='−'+needAmt;
+          diffClass='kn-diff-minus';
+          diffSub=nextG.grade+'등급까지 '+needAmt+'억 부족';
+        }
+      }
+    }
+
+    /* ── 연말 시뮬레이터 (pills) ── */
+    let pill1='',pill2='';
+    if(item.type==='absolute'){
+      pill1='<strong>현재 스피드 유지 시</strong> 연말 예상 '+curDisp+' 유지';
+      pill2='외부 데이터(KRG) 기반 측정';
+    }else{
+      const speed=item.current/cm;
+      const projected=speed*12;
+      const need=remaining>0?Math.max(0,(item.target-item.current)/remaining):0;
+      const u=item.unit;
+      const pD=Number.isInteger(projected)?projected.toString():projected.toFixed(1);
+      const nD=Number.isInteger(need)?need.toString():need.toFixed(1);
+      pill1='<strong>현재 스피드 유지 시</strong> 연말 예상 '+pD+u;
+      pill2='목표 달성까지 월 평균 '+nD+u+' 필요';
+    }
+
+    const metaSub=item.type==='absolute'?'자사 vs 경쟁사 반복매출 비율'
+                 :item.type==='count'?'연간 누적 수주 건수':'연간 누적 수주 금액';
+
+    /* ── 카드 HTML ── */
+    cardsH+=`
+    <div class="kpi-card-new${idx===0?' kpi-active':''}" id="kn-card-${idx}" onclick="knToggle(${idx})">
+      <div class="kn-head"><h3>${item.name}</h3><div class="kn-grade-badge kn-gb-${gc}">${grade}</div></div>
+      <div class="kn-body">
+        <div class="kn-meta-grid">
+          <div class="kn-meta-item">
+            <div class="kn-meta-lbl">현재 실적</div>
+            <div class="kn-meta-val">${curDisp}${item.unit!=='%'?'<span class="kn-meta-unit">'+item.unit+'</span>':''}</div>
+            <div class="kn-meta-sub">${metaSub}</div>
+          </div>
+          <div class="kn-meta-item">
+            <div class="kn-meta-lbl">진척 현황</div>
+            <div class="${diffClass}">${diffVal}${diffUnit}</div>
+            <div class="kn-meta-sub">${diffSub}</div>
+          </div>
+        </div>
+        <div class="kn-status-row"><span class="kn-status-badge kn-st-${gc}"><span class="kn-eval-label">예상평가</span><span class="kn-eval-grade">${grade}</span></span></div>
+        <div class="kn-bar-wrap"><div class="kn-bar-fill kn-bf-${gc}" style="width:${barPct}%"></div></div>
+        <div class="kn-divider"></div>
+        <div class="kn-pills">
+          <div class="kn-pill"><span class="kn-dot kn-dot-blue"></span><span>${pill1}</span></div>
+          <div class="kn-pill"><span class="kn-dot kn-dot-orange"></span><span>${pill2}</span></div>
+        </div>
+      </div>
+    </div>`;
+
+    /* ── 상세 패널 HTML ── */
+    const def=KN_DEFS[idx];
+    const nextGrade=nextG?.grade||null;
+    panelsH+=`
+    <div class="kn-panel${idx===0?'':' kn-hidden'}" id="kn-panel-${idx}">
+      <div class="kn-panel-inner">
+        <div class="kn-panel-title">${def.title} — KPI 정의</div>
+        <div class="kn-panel-cols">
+          <div class="kn-def-rows">
+            ${def.rows.map(([l,v])=>`<div class="kn-def-item"><div class="kn-def-lbl">${l}</div><div class="kn-def-val">${v}</div></div>`).join('')}
+            <div class="kn-formula"><div class="kn-formula-lbl">산식</div><div class="kn-formula-val">${def.formula}</div></div>
+          </div>
+          <div class="kn-grade-wrap">
+            <h4>등급 평가 기준</h4>
+            <table class="kn-grade-tbl">
+              <thead><tr><th class="kn-gc">등급</th><th>기준값</th></tr></thead>
+              <tbody>
+                ${def.grades.map(([g,v],gIdx)=>{
+                  const isCur=g===grade;
+                  const isNext=g===nextGrade;
+                  const cls=isCur?'kn-cur':isNext?'kn-next':'';
+                  const mark=isCur?'<span class="kn-cur-mark">'+g+'</span>':isNext?'<span class="kn-next-mark">'+g+'</span>':g;
+                  let dispV=v;
+                  if(item.type==='achievement'){
+                    const gr=item.grades[gIdx];
+                    if(gr&&gIdx<item.grades.length-1){
+                      dispV=v+' (≥ '+Math.round(item.target*gr.min)+'억)';
+                    }else if(gr){
+                      const prevMin=item.grades[gIdx-1]?.min||0;
+                      dispV=v+' (< '+Math.round(item.target*prevMin)+'억)';
+                    }
+                  }
+                  return '<tr'+(cls?' class="'+cls+'"':'')+'><td class="kn-gc">'+mark+'</td><td>'+dispV+'</td></tr>';
+                }).join('')}
+              </tbody>
+            </table>
+            <div class="kn-legend">
+              <div class="kn-legend-item"><div class="kn-legend-dot" style="background:#F5F7FF;border:1px solid #CBD5E1"></div>현재 등급</div>
+              ${nextGrade?'<div class="kn-legend-item"><div class="kn-legend-dot" style="background:#FFF7ED;border:1px solid #FCD34D"></div>목표 등급</div>':''}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  grid.innerHTML=cardsH;
+  panelWrap.innerHTML=panelsH;
+  knActive=0;
+}
+
+/* p-kpi 탭은 종합현황 KPI 섹션으로 안내 */
+function buildKpi(){
+  const el=document.getElementById('p-kpi');
+  if(!el)return;
+  el.innerHTML=`
+  <div class="kpi-section" id="kn-section">
+    <div class="kpi-sec-label">KPI 실적 현황</div>
+    <div class="kpi-grid-new" id="kn-grid"></div>
+    <div class="kn-hint"><div class="kn-hint-inner"><div class="kn-hint-icon">↓</div>카드를 클릭하면 KPI 정의 및 등급 기준을 확인할 수 있습니다</div></div>
+    <div id="kn-panels"></div>
+  </div>`;
+  buildKpiCards();
+}
+
+function applyKpiEdit(){
+  const g=id=>document.getElementById(id);
+  const nv=id=>{const el=g(id);return el&&el.value!==''?parseFloat(el.value):null;};
+  if(!D.kpi)D.kpi={year:2026,currentMonth:2,items:[]};
+  D.kpi.year=nv('kpi_year')??D.kpi.year;
+  D.kpi.currentMonth=nv('kpi_month')??D.kpi.currentMonth;
+  (D.kpi.items||[]).forEach((item,i)=>{
+    item.target=nv(`kpi_target_${i}`)??item.target;
+    item.current=nv(`kpi_current_${i}`)??item.current;
+    const bv=nv(`kpi_base_${i}`);
+    if(bv!==null)item.base=bv;
+    (item.grades||[]).forEach((gr,gi)=>{
+      gr.min=nv(`kpi_grade_${i}_${gi}`)??gr.min;
+    });
+  });
+  saveToLocal();
+  buildKpi();
+  editToast('✅','KPI 저장 완료','KPI 현황 탭에 반영됐습니다');
+}
+
+/* ══════════════════════════════════════
    데이터 입력
 ══════════════════════════════════════ */
 /* saveToLocal: SEED 객체를 현재 D 값으로 업데이트 (localStorage 미사용) */
@@ -5480,6 +5977,55 @@ function buildEdit(){
       </div>
     </div>
 
+    <!-- KPI 목표 설정 -->
+    <div class="edit-section">
+      <div class="edit-sh" onclick="toggleSection('s-kpi-target')">🎯 KPI 목표 설정 <span id="s-kpi-target-icon">▼</span></div>
+      <div class="edit-body" id="s-kpi-target">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">각 KPI의 목표값·실적값·등급 기준을 수정할 수 있습니다</div>
+        <div style="margin-bottom:10px;">
+          <div class="edit-grid2">
+            <div class="edit-field">
+              <label class="edit-label">기준 연도</label>
+              <input class="edit-input" id="kpi_year" type="number" value="${D.kpi?.year||2026}">
+            </div>
+            <div class="edit-field">
+              <label class="edit-label">현재 기준월 (1~12)</label>
+              <input class="edit-input" id="kpi_month" type="number" value="${D.kpi?.currentMonth||2}" min="1" max="12">
+            </div>
+          </div>
+        </div>
+        ${(D.kpi?.items||[]).map((item,i)=>`
+        <div style="margin-top:18px;padding-top:16px;border-top:2px solid var(--border);">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">${item.name} (${item.id})</div>
+          <div class="edit-grid2">
+            <div class="edit-field">
+              <label class="edit-label">목표값</label>
+              <input class="edit-input" id="kpi_target_${i}" type="number" step="any" value="${item.target}">
+            </div>
+            <div class="edit-field">
+              <label class="edit-label">현재 실적값</label>
+              <input class="edit-input" id="kpi_current_${i}" type="number" step="any" value="${item.current}">
+            </div>
+            ${item.base!==undefined?`<div class="edit-field">
+              <label class="edit-label">전년 기준값 (base)</label>
+              <input class="edit-input" id="kpi_base_${i}" type="number" step="any" value="${item.base}">
+            </div>`:''}
+          </div>
+          <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--dim);margin-bottom:6px;">등급 기준 (min 값)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${(item.grades||[]).map((g,gi)=>`
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <span style="font-size:11px;font-weight:700;color:${{S:'#2D2D6B',A:'#3D3D8F',B:'#4CAF50',C:'#FF9800',D:'#F44336'}[g.grade]}">${g.grade}</span>
+              <input class="edit-input-xs" id="kpi_grade_${i}_${gi}" type="number" step="any" value="${g.min}">
+            </div>`).join('')}
+          </div>
+        </div>`).join('')}
+        <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+          <button onclick="applyKpiEdit()" class="edbtn-pink">KPI 저장 & 반영</button>
+        </div>
+      </div>
+    </div>
+
     <div style="text-align:center;padding:20px;font-size:12px;color:var(--muted);">
       💾 [저장 & 반영] 클릭 시 현재 세션에 데이터가 반영됩니다. JSON 내보내기로 백업하세요.
     </div>
@@ -5871,6 +6417,21 @@ function applyEditData(){
       return client?{client,year,amount,note}:null;
     }).filter(Boolean);
     if(kt_notes.length>0)D.competitor.kt_notes=kt_notes;
+  }
+
+  // KPI 목표 설정
+  if(D.kpi&&D.kpi.items){
+    D.kpi.year=nv('kpi_year')??D.kpi.year;
+    D.kpi.currentMonth=nv('kpi_month')??D.kpi.currentMonth;
+    (D.kpi.items||[]).forEach((item,i)=>{
+      item.target=nv(`kpi_target_${i}`)??item.target;
+      item.current=nv(`kpi_current_${i}`)??item.current;
+      const bv=nv(`kpi_base_${i}`);
+      if(bv!==null)item.base=bv;
+      (item.grades||[]).forEach((gr,gi)=>{
+        gr.min=nv(`kpi_grade_${i}_${gi}`)??gr.min;
+      });
+    });
   }
 
   saveToLocal();
