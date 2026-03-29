@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### 게이지 (Gauge)
 
-- [ ] **GAUGE-01**: KPI 미니 게이지에서 RRMS 목표 대비 현재 달성률을 시각적으로 표시
-- [ ] **GAUGE-02**: KPI 미니 게이지에서 KA레퍼런스 목표 대비 현재 달성률을 시각적으로 표시
-- [ ] **GAUGE-03**: KPI 미니 게이지에서 구축형수주액 목표 대비 현재 달성률을 시각적으로 표시
+- [x] **GAUGE-01**: KPI 미니 게이지에서 RRMS 목표 대비 현재 달성률을 시각적으로 표시
+- [x] **GAUGE-02**: KPI 미니 게이지에서 KA레퍼런스 목표 대비 현재 달성률을 시각적으로 표시
+- [x] **GAUGE-03**: KPI 미니 게이지에서 구축형수주액 목표 대비 현재 달성률을 시각적으로 표시
 
 ### 인사이트 (Insight)
 
@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### UI
 
 - [ ] **UI-01**: 인사이트 카드에 상태별 색상 코딩 적용 (초록=좋음, 노랑=주의, 빨강=원인파악)
-- [ ] **UI-02**: 인사이트 섹션을 차트 아래 별도 영역에 배치
+- [x] **UI-02**: 인사이트 섹션을 차트 아래 별도 영역에 배치
 
 ## v2 Requirements
 
@@ -48,15 +48,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GAUGE-01 | Phase 1 | Pending |
-| GAUGE-02 | Phase 1 | Pending |
-| GAUGE-03 | Phase 1 | Pending |
+| GAUGE-01 | Phase 1 | Complete |
+| GAUGE-02 | Phase 1 | Complete |
+| GAUGE-03 | Phase 1 | Complete |
 | INST-01 | Phase 2 | Pending |
 | INST-02 | Phase 2 | Pending |
 | INST-03 | Phase 3 | Pending |
 | INST-04 | Phase 2 | Pending |
 | UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 9 total

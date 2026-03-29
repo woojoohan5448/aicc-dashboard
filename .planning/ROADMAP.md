@@ -12,7 +12,7 @@ KPI 숫자를 자동으로 해석하는 인사이트 섹션을 buildOv() 함수 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Insight Section & KPI Gauges** - 인사이트 섹션 영역을 생성하고 3개 KPI 달성률 게이지를 표시
+- [x] **Phase 1: Insight Section & KPI Gauges** - 인사이트 섹션 영역을 생성하고 3개 KPI 달성률 게이지를 표시 (completed 2026-03-29)
 - [ ] **Phase 2: Trend & Projection Analysis** - 트렌드, 연말 전망, 시장 지위 분석 카드 구현
 - [ ] **Phase 3: Anomaly Detection & Visual Polish** - 이상치 경고와 상태별 색상 코딩 적용
 
@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **UI hint**: yes
 
 Plans:
-- [ ] 01-01-PLAN.md -- Insight section HTML + drawGauge() + 3 KPI canvas gauges
+- [x] 01-01-PLAN.md -- Insight section HTML + drawGauge() + 3 KPI canvas gauges
 
 ### Phase 2: Trend & Projection Analysis
 **Goal**: 사용자가 KPI 추세와 연말 목표 달성 가능성을 자동 분석 결과로 확인할 수 있다
@@ -68,6 +68,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Insight Section & KPI Gauges | 0/1 | Not started | - |
+| 1. Insight Section & KPI Gauges | 1/1 | Complete   | 2026-03-29 |
 | 2. Trend & Projection Analysis | 0/0 | Not started | - |
 | 3. Anomaly Detection & Visual Polish | 0/0 | Not started | - |
