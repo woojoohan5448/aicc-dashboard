@@ -508,6 +508,7 @@ tr:hover td { background:var(--bg); }
   <button class="tb" onclick="go(&#39;comp&#39;,this)">경쟁현황</button>
   <div style="margin-left:auto;display:flex;align-items:center;gap:0;">
     <button class="tb" style="color:var(--pink);font-weight:600;" id="btn-ai" onclick="runTabAi()">📊 인사이트 분석</button>
+    <button class="tb" style="color:#22C55E;font-weight:600;" id="btn-market" onclick="runMarketAi()">🌐 시장 인사이트</button>
     <div style="width:1px;height:20px;background:var(--border);"></div>
     <button class="tb tb-edit" onclick="go(&#39;edit&#39;,this)" style="margin-left:0;">✏️ 데이터 입력</button>
   </div>
@@ -6023,6 +6024,32 @@ function buildEdit(){
       </div>
     </div>
 
+    <!-- 인사이트 직접 입력 -->
+    <div class="edit-section">
+      <div class="edit-sh" onclick="toggleSection('s-insight')">✏️ 인사이트 직접 입력 <span id="s-insight-icon">▼</span></div>
+      <div class="edit-body" id="s-insight">
+        ${['ov','kpi','sub','bld','ch','comp'].map(t=>{
+          const names={ov:'종합현황',kpi:'KPI현황',sub:'구독형',bld:'구축형',ch:'채널현황',comp:'경쟁현황'};
+          const r=_aiCache.results[t]||{};
+          return `<div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            <div style="font-size:13px;font-weight:700;color:var(--pink);margin-bottom:8px;">${names[t]}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <div class="edit-field"><label class="edit-label">현재상태</label><textarea class="edit-input" id="ins_${t}_현재상태" rows="3" style="resize:vertical;">${r['현재상태']||''}</textarea></div>
+              <div class="edit-field"><label class="edit-label">특이사항</label><textarea class="edit-input" id="ins_${t}_특이사항" rows="3" style="resize:vertical;">${r['특이사항']||''}</textarea></div>
+              <div class="edit-field"><label class="edit-label">원인파악</label><textarea class="edit-input" id="ins_${t}_원인파악" rows="3" style="resize:vertical;">${r['원인파악']||''}</textarea></div>
+            </div>
+          </div>`;
+        }).join('')}
+        <div style="margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:700;color:#22C55E;margin-bottom:8px;">시장 인사이트</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="edit-field"><label class="edit-label">경쟁사 수주 및 시장 동향</label><textarea class="edit-input" id="ins_market1" rows="4" style="resize:vertical;">${(_aiCache.market1&&_aiCache.market1.text)||''}</textarea></div>
+            <div class="edit-field"><label class="edit-label">도입 사례 및 고객 반응</label><textarea class="edit-input" id="ins_market2" rows="4" style="resize:vertical;">${(_aiCache.market2&&_aiCache.market2.text)||''}</textarea></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Sheets 저장 & 배포 -->
     <div class="edit-section">
       <div class="edit-sh">📤 Sheets 저장 & 배포</div>
@@ -6443,6 +6470,20 @@ function applyEditData(){
     });
   }
 
+  // 인사이트 필드 저장
+  const _sv=id=>{const el=document.getElementById(id);return el?el.value.trim():null;};
+  ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{
+    const s=_sv(`ins_${t}_현재상태`), n=_sv(`ins_${t}_특이사항`), w=_sv(`ins_${t}_원인파악`);
+    if(s||n||w){
+      _aiCache.results[t]={'현재상태':s||'','특이사항':n||'','원인파악':w||''};
+      if(!_aiCache.timestamp)_aiCache.timestamp=_nowTs();
+    }
+  });
+  const m1v=_sv('ins_market1'), m2v=_sv('ins_market2');
+  if(m1v)_aiCache.market1={text:m1v,sources:_aiCache.market1?.sources||[]};
+  if(m2v)_aiCache.market2={text:m2v,sources:_aiCache.market2?.sources||[]};
+  if(!_aiCache.timestamp&&(m1v||m2v))_aiCache.timestamp=_nowTs();
+
   saveToLocal();
   rebuildAll();
   editToast('✅','저장 & 반영 완료','모든 탭 데이터가 업데이트됐습니다');
@@ -6703,70 +6744,86 @@ function _parseMarketResponse(data){
   return {text,sources};
 }
 
+function _nowTs(){
+  const now=new Date();
+  return `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
 function runTabAi(){
   if(!_AI_CONFIG.apiKey||_AI_CONFIG.apiKey==='YOUR_API_KEY_HERE'){
     toast('⚠️','API 키를 설정해주세요','index.html에서 _AI_CONFIG.apiKey를 입력하세요.');
     return;
   }
-  // 캐시 초기화
   _aiCache.timestamp=null;
   _aiCache.results={ov:null,kpi:null,sub:null,bld:null,ch:null,comp:null};
-  _aiCache.market1=null;_aiCache.market2=null;
-  // 현재 탭 로딩 표시
   const curTab=_activeTab();
   const curEl=document.getElementById('ai-insight-'+curTab);
   if(curEl){curEl.className='ai-placeholder';curEl.innerHTML='⏳ 전체 탭 분석 중...';}
-  const mEl=document.getElementById('ai-market-ov');
-  if(mEl){mEl.className='ai-placeholder';mEl.innerHTML='⏳ 시장 동향 조사 중...';}
   _setAiBtn('⏳ 분석 중...');
 
-  const analysisReq=_fetchGemini({contents:[{parts:[{text:_buildAllPrompt()}]}]});
-  const market1Req=_fetchGemini({
+  _fetchGemini({contents:[{parts:[{text:_buildAllPrompt()}]}]}).then(data=>{
+    _aiCache.timestamp=_nowTs();
+    const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const cleaned=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    let parsed;
+    try{parsed=JSON.parse(cleaned);}catch(_){parsed=null;}
+    if(parsed){
+      ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{if(parsed[t])_aiCache.results[t]=parsed[t];});
+    }else{
+      _aiCache.results[curTab]={'현재상태':raw,'특이사항':'','원인파악':''};
+    }
+    _renderCachedInsight(_activeTab());
+    _syncInsightFields();
+    _setAiBtn('📊 인사이트 분석 ✓');
+  }).catch(err=>{
+    const curEl2=document.getElementById('ai-insight-'+curTab);
+    if(curEl2){curEl2.className='ai-placeholder';curEl2.innerHTML='❌ '+err.message;}
+    _setAiBtn('📊 인사이트 분석');
+  });
+}
+
+function runMarketAi(){
+  if(!_AI_CONFIG.apiKey||_AI_CONFIG.apiKey==='YOUR_API_KEY_HERE'){
+    toast('⚠️','API 키를 설정해주세요','');return;
+  }
+  _aiCache.market1=null;_aiCache.market2=null;
+  const mEl=document.getElementById('ai-market-ov');
+  if(mEl){mEl.className='ai-placeholder';mEl.innerHTML='⏳ 시장 동향 조사 중...';}
+  const btn=document.getElementById('btn-market');
+  if(btn)btn.textContent='⏳ 조사 중...';
+
+  const m1=_fetchGemini({
     contents:[{parts:[{text:'2025년~2026년 최신 정보만 사용해서 아래 순서대로 답변해줘.\n시점 불명확한 정보는 제외. 도입부 없이 바로 시작.\n\n1. 국내 AICC/컨택센터 수주 및 계약 사례\n- KT, SKT, 카카오엔터프라이즈 등 최신 계약 사례\n- 공공기관/대기업 AICC 도입 발표\n- 시점 반드시 포함 (없으면 해당 항목 제외)\n\n2. AICC 관련 AI 기술 최신 동향\n- 음성인식(STT), 음성합성(TTS), LLM 기반 상담 AI 신기술 발표\n- 주요 AI 테크사(구글, 마이크로소프트, 네이버, 카카오 등) 컨택센터 관련 신규 모델/서비스 출시\n- 시장 반응 및 도입 사례\n\n3. AICC 시장 주목할 움직임\n- M&A, 파트너십, 투자 유치 등 업계 이슈\n\n답변 규칙:\n- 각 항목: 굵은 제목 + 핵심 2줄 이내\n- 시점 반드시 포함\n- 정보 없는 항목은 생략\n- 전체 400자 이내'}]}],
     tools:[{google_search:{}}]
   });
-  const market2Req=_fetchGemini({
-    contents:[{parts:[{text:'다음 항목에 대해 2025년~2026년 실제 사례와 현장 반응 위주로 조사해줘:\n\n1. 기업들의 AICC 도입 후 실제 효과/ROI 사례\n2. AICC 도입 실패 또는 문제 발생 사례\n3. 고객사들의 AICC에 대한 불만/요구사항\n4. AI 상담원 거부감 등 실제 고객 반응\n\n답변 규칙:\n- 도입부/인사말 없이 바로 내용 시작\n- 각 항목: 제목 1줄 + 핵심 내용 1-2줄만\n- 사례에는 반드시 시점 명시 예: (2026.01), (2025년 하반기)\n- 시점 불명확한 정보는 제외\n- 불필요한 수식어, 부연설명 제거\n- 총 답변 200자 이내로 압축'}]}],
+  const m2=_fetchGemini({
+    contents:[{parts:[{text:'다음 항목에 대해 2025년~2026년 실제 사례와 현장 반응 위주로 조사해줘:\n\n1. 기업들의 AICC 도입 후 실제 효과/ROI 사례\n2. AICC 도입 실패 또는 문제 발생 사례\n3. 고객사들의 AICC에 대한 불만/요구사항\n4. AI 상담원 거부감 등 실제 고객 반응\n\n답변 규칙:\n- 가장 중요한 2개 항목만 선택해서 답변\n- 각 항목: 굵은 제목 + 핵심 1-2줄\n- 사례에는 반드시 시점 명시 예: (2026.01), (2025년 하반기)\n- 시점 불명확한 정보는 제외\n- 전체 200자 이내'}]}],
     tools:[{google_search:{}}]
   });
 
-  Promise.allSettled([analysisReq,market1Req,market2Req]).then(([anaRes,m1Res,m2Res])=>{
-    const now=new Date();
-    const ts=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    _aiCache.timestamp=ts;
-
-    // 실적 분석 처리
-    if(anaRes.status==='fulfilled'){
-      const raw=anaRes.value?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-      const cleaned=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-      let parsed;
-      try{parsed=JSON.parse(cleaned);}catch(_){parsed=null;}
-      if(parsed){
-        ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{
-          if(parsed[t])_aiCache.results[t]=parsed[t];
-        });
-      }else{
-        _aiCache.results[curTab]={'현재상태':raw,'특이사항':'','원인파악':''};
-      }
-    }else{
-      _aiCache.results[curTab]={'현재상태':'실적 분석 실패: '+anaRes.reason?.message,'특이사항':'','원인파악':''};
-    }
-
-    // 시장 트렌드 처리
-    if(m1Res.status==='fulfilled'){
-      _aiCache.market1=_parseMarketResponse(m1Res.value);
-    }else{
-      _aiCache.market1={text:'시장 동향 조회 실패: '+m1Res.reason?.message,sources:[]};
-    }
-    if(m2Res.status==='fulfilled'){
-      _aiCache.market2=_parseMarketResponse(m2Res.value);
-    }else{
-      _aiCache.market2={text:'도입 사례 조회 실패: '+m2Res.reason?.message,sources:[]};
-    }
-
+  Promise.allSettled([m1,m2]).then(([r1,r2])=>{
+    if(!_aiCache.timestamp)_aiCache.timestamp=_nowTs();
+    _aiCache.market1=r1.status==='fulfilled'?_parseMarketResponse(r1.value):{text:'조회 실패: '+r1.reason?.message,sources:[]};
+    _aiCache.market2=r2.status==='fulfilled'?_parseMarketResponse(r2.value):{text:'조회 실패: '+r2.reason?.message,sources:[]};
     _renderCachedInsight(_activeTab());
-    _setAiBtn('📊 인사이트 분석 ✓');
+    _syncInsightFields();
+    if(btn)btn.textContent='🌐 시장 인사이트 ✓';
   });
+}
+
+function _syncInsightFields(){
+  const tabs=['ov','kpi','sub','bld','ch','comp'];
+  const fields=['현재상태','특이사항','원인파악'];
+  tabs.forEach(t=>{
+    const r=_aiCache.results[t];
+    if(!r)return;
+    fields.forEach(f=>{
+      const el=document.getElementById(`ins_${t}_${f}`);
+      if(el&&!el._userEdited)el.value=r[f]||'';
+    });
+  });
+  if(_aiCache.market1){const el=document.getElementById('ins_market1');if(el&&!el._userEdited)el.value=_aiCache.market1.text||'';}
+  if(_aiCache.market2){const el=document.getElementById('ins_market2');if(el&&!el._userEdited)el.value=_aiCache.market2.text||'';}
 }
 
 /* ── Sheets 저장 ── */
@@ -6814,6 +6871,8 @@ window.addEventListener('load',()=>{
     if(!_AI_CONFIG.apiKey){
       const btn=document.getElementById('btn-ai');
       if(btn)btn.style.display='none';
+      const btn2=document.getElementById('btn-market');
+      if(btn2)btn2.style.display='none';
     }
     // READ_ONLY 모드: 버튼 숨기고 캐시 데이터로 인사이트 표시
     if(window._READ_ONLY===true){
