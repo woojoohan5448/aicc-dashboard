@@ -121,15 +121,15 @@ body { background:var(--bg); color:var(--text);
 .ai-market-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 @media(max-width:900px){.ai-market-grid{grid-template-columns:1fr;}}
 .market-item{margin-bottom:14px;}
-.market-item-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
-.market-item-body{font-size:12px;color:var(--dim);line-height:1.7;padding-left:14px;margin:0;}
+.market-item-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.market-item-body{font-size:13px;font-weight:400;color:var(--text);line-height:1.7;padding-left:14px;margin:0;}
 .market-source{font-size:11px;color:var(--muted);margin-top:4px;padding-left:4px;}
 .market-source a{color:var(--dim);text-decoration:none;}
 .market-source a:hover{text-decoration:underline;}
 .ai-card{background:var(--card,#fff);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px 20px;display:flex;align-items:stretch;overflow:hidden;}
 .ai-card-bar{width:4px;flex-shrink:0;border-radius:2px;margin-right:14px;}
-.ai-card-title{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text);}
-.ai-card-body{font-size:13px;line-height:1.7;color:var(--text);}
+.ai-card-title{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.ai-card-body{font-size:13px;font-weight:400;line-height:1.7;color:var(--text);}
 /* ── HEADER ── */
 .header { background:#fff; border-bottom:3px solid var(--pink);
   padding:0 32px; display:flex; align-items:center;
@@ -3605,6 +3605,7 @@ if(!SEED.insights){
     ch:{현재상태:'',특이사항:'',원인파악:''},
     comp:{현재상태:'',특이사항:'',원인파악:''},
     market1:'',market2:'',
+    market1_sources:[],market2_sources:[],
     timestamp:null
   };
 }
@@ -6484,7 +6485,7 @@ function applyEditData(){
   }
 
   // 인사이트 필드 저장 → D.insights + _aiCache 동시 반영
-  if(!D.insights)D.insights={ov:{},kpi:{},sub:{},bld:{},ch:{},comp:{},market1:'',market2:'',timestamp:null};
+  if(!D.insights)D.insights={ov:{},kpi:{},sub:{},bld:{},ch:{},comp:{},market1:'',market2:'',market1_sources:[],market2_sources:[],timestamp:null};
   const _sv=id=>{const el=document.getElementById(id);return el?el.value.trim():null;};
   ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{
     const s=_sv(`ins_${t}_현재상태`)||'', n=_sv(`ins_${t}_특이사항`)||'', w=_sv(`ins_${t}_원인파악`)||'';
@@ -6499,6 +6500,8 @@ function applyEditData(){
   D.insights.market2=m2v;
   if(m1v)_aiCache.market1={text:m1v,sources:_aiCache.market1?.sources||[]};
   if(m2v)_aiCache.market2={text:m2v,sources:_aiCache.market2?.sources||[]};
+  D.insights.market1_sources=_aiCache.market1?.sources||[];
+  D.insights.market2_sources=_aiCache.market2?.sources||[];
   D.insights.timestamp=_aiCache.timestamp||_nowTs();
   if(!_aiCache.timestamp&&(m1v||m2v))_aiCache.timestamp=_nowTs();
 
@@ -6522,20 +6525,20 @@ function _syncInsightsFromD(){
       _aiCache.results[t]={'현재상태':r['현재상태']||'','특이사항':r['특이사항']||'','원인파악':r['원인파악']||''};
     }
   });
-  if(ins.market1)_aiCache.market1={text:ins.market1,sources:[]};
-  if(ins.market2)_aiCache.market2={text:ins.market2,sources:[]};
+  if(ins.market1||ins.market1_sources?.length)_aiCache.market1={text:ins.market1||'',sources:ins.market1_sources||[]};
+  if(ins.market2||ins.market2_sources?.length)_aiCache.market2={text:ins.market2||'',sources:ins.market2_sources||[]};
   if(ins.timestamp)_aiCache.timestamp=ins.timestamp;
 }
 _syncInsightsFromD();
 /* _aiCache → D.insights 동기화 (AI 분석 후 호출) */
 function _syncInsightsToD(){
-  if(!D.insights)D.insights={ov:{},kpi:{},sub:{},bld:{},ch:{},comp:{},market1:'',market2:'',timestamp:null};
+  if(!D.insights)D.insights={ov:{},kpi:{},sub:{},bld:{},ch:{},comp:{},market1:'',market2:'',market1_sources:[],market2_sources:[],timestamp:null};
   ['ov','kpi','sub','bld','ch','comp'].forEach(t=>{
     const r=_aiCache.results[t];
     if(r)D.insights[t]={'현재상태':r['현재상태']||'','특이사항':r['특이사항']||'','원인파악':r['원인파악']||''};
   });
-  if(_aiCache.market1)D.insights.market1=_aiCache.market1.text||'';
-  if(_aiCache.market2)D.insights.market2=_aiCache.market2.text||'';
+  if(_aiCache.market1){D.insights.market1=_aiCache.market1.text||'';D.insights.market1_sources=_aiCache.market1.sources||[];}
+  if(_aiCache.market2){D.insights.market2=_aiCache.market2.text||'';D.insights.market2_sources=_aiCache.market2.sources||[];}
   D.insights.timestamp=_aiCache.timestamp;
 }
 
@@ -6663,14 +6666,13 @@ function formatAiText(text){
     .replace(/\n/g,'<br>');
 }
 
-function renderInsightCards(parsed,ts){
-  const timeStr=ts?`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">📊 인사이트 분석 결과 · ${ts} 기준</div>`:'';
+function renderInsightCards(parsed){
   const cards=[
     {icon:'📊',title:'현재 상태',color:'#3D3D8F',text:parsed['현재상태']},
     {icon:'⚠️',title:'특이사항',color:'#FF9800',text:parsed['특이사항']},
     {icon:'🔴',title:'원인 파악',color:'#F44336',text:parsed['원인파악']}
   ];
-  return `${timeStr}<div class="ai-insight-grid">${cards.map(c=>`
+  return `<div class="ai-insight-grid">${cards.map(c=>`
     <div class="ai-card">
       <div class="ai-card-bar" style="background:${c.color};"></div>
       <div style="flex:1;">
@@ -6713,22 +6715,22 @@ function _formatMarketText(text,sources){
   }).join('')+(src.length>visible.length?`<div class="market-source" style="margin-top:4px;">📎 ${src.slice(visible.length).map(s=>`<a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>`).join(' ')}</div>`:'');
 }
 
-function renderMarketSection(m1,m2,ts){
-  const timeStr=ts?` · ${ts} 기준`:'';
+function renderMarketSection(m1,m2){
+  const empty={text:'',sources:[]};
   function mkCard(icon,title,data){
+    if(!data||(!data.text&&!data.sources?.length))return '';
     return `<div class="ai-card">
       <div class="ai-card-bar" style="background:#22C55E;"></div>
       <div style="flex:1;">
         <div class="ai-card-title">${icon} ${title}</div>
-        <div class="ai-card-body">${_formatMarketText(data.text||'',data.sources)}</div>
+        <div class="ai-card-body">${_formatMarketText(data.text||'',data.sources||[])}</div>
       </div>
     </div>`;
   }
   return `<div class="ai-market-section">
-    <div class="ai-market-title">🌐 시장 인사이트 · Google Search 기반 실시간 조사${timeStr}</div>
     <div class="ai-market-grid">
-      ${mkCard('📡','경쟁사 수주 및 시장 동향',m1)}
-      ${mkCard('💬','도입 사례 및 고객 반응',m2)}
+      ${mkCard('📡','경쟁사 수주 및 시장 동향',m1||empty)}
+      ${mkCard('💬','도입 사례 및 고객 반응',m2||empty)}
     </div>
   </div>`;
 }
@@ -6743,13 +6745,13 @@ function _renderCachedInsight(tab){
   const cached=_aiCache.results[tab];
   if(cached){
     el.className='';
-    el.innerHTML=renderInsightCards(cached,_aiCache.timestamp);
+    el.innerHTML=renderInsightCards(cached);
   }
   if(tab==='ov'){
     const mEl=document.getElementById('ai-market-ov');
-    if(mEl&&_aiCache.market1&&_aiCache.market2){
+    if(mEl&&(_aiCache.market1||_aiCache.market2)){
       mEl.className='';
-      mEl.innerHTML=renderMarketSection(_aiCache.market1,_aiCache.market2,_aiCache.timestamp);
+      mEl.innerHTML=renderMarketSection(_aiCache.market1,_aiCache.market2);
     }
   }
 }
